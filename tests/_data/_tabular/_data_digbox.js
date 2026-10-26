@@ -1087,6 +1087,21 @@ module.exports = [
       '</tbody>\n' +
       '</table>'
   },
+  {
+    // `\\` ends the first argument: read one `\` back it shielded the brace, so both halves came out
+    // empty and `{a` leaked into the cell beside them. It is a line break, hence the `<br>` in `a`.
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline\n' +
+      '\\backslashbox{a \\\\}{b} & c \\\\\n' +
+      '\\hline\n' +
+      'd & e\n' +
+      '\\end{tabular}',
+    tsv: 'b,a \tc\nd\te',
+    csv: '"b,a ",c\nd,e',
+    markdown: '| b <br> a  | c |\n' +
+      '| :--- | :--- |\n' +
+      '| d | e |'
+  },
   // {
   //   latex: '',
   //   tsv: '',

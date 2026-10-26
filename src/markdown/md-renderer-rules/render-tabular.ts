@@ -8,11 +8,35 @@ import {
   RenderTableCellContentResult
 } from "../common/render-table-cell-content";
 import { getItemizePlainMarker, getEnumeratePlainMarker } from "../common/list-markers";
-import { attrsSharedMarker } from "../common/consts";
+import {
+  attrsSharedMarker,
+  LIST_OPEN_TOKEN_TYPES, LIST_CLOSE_TOKEN_TYPES, LIST_STRUCTURE_TOKEN_TYPES,
+} from "../common/consts";
 
 const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
 ]);
+
+// Such a token has its cell Markdown/TSV emitted by handleListTokensForCellMarkdown; its body must not
+// be double-appended as leaf content.
+const LIST_STITCH_TOKEN_TYPES: ReadonlySet<string> = LIST_STRUCTURE_TOKEN_TYPES;
+
+// Boundaries end a run — and a non-member has no other export path, so listing a type here drops
+// its Markdown/TSV. Hence only content-free tokens belong: paragraph markers, not a fence or an
+// lstlisting env. `block` cannot be tested instead: createBufferedState marks the unwrapped inline
+// leaves this branch exists for as block too.
+const RUN_BOUNDARY_TOKEN_TYPES: Set<string> = new Set(['paragraph_open', 'paragraph_close']);
+
+// A cell token that reaches the leaf branch below, so it may join a leaf run.
+const isLeafRunMember = (token: any): boolean =>
+  !!token
+  && !token.hidden
+  && !RUN_BOUNDARY_TOKEN_TYPES.has(token.type)
+  && token.token !== 'inline' && token.type !== 'inline'
+  && !TABLE_TOKENS.has(token.token) && !TABLE_TOKENS.has(token.type)
+  && token.type !== 'tabular' && token.type !== 'tabular_inline'
+  && !token.children?.length
+  && !LIST_STITCH_TOKEN_TYPES.has(token.type);
 
 /**
  * Appends a text chunk to the last line of a string array.
@@ -135,6 +159,8 @@ type RenderCtx = {
   env: any;
   slf: any;
   highlight?: any;
+  // Nesting of the table being rendered: renderTableCellContent stamps it onto the tokens it walks.
+  isSubTable?: boolean;
 };
 
 type OutputGates = {
@@ -225,6 +251,40 @@ const renderNonTableTokenIntoCell = (
   if (needHtml) {
     acc.result += rendered;
   }
+  // Single-line nested lists unwrap the item body to bare inline tokens (not an `inline`
+  // wrapper), so collect it here for Markdown/TSV/CSV/smoothed; HTML is already appended.
+  // Whole run at once: renderTableCellContent consumes siblings (link_open + text + link_close).
+  // Gated first: with no export requested this would render the run a second time for nothing.
+  if ((needTsv || needCsv || needMd || needSmoothed)
+      && isLeafRunMember(token) && !isLeafRunMember(ctx.tokens[ctx.idx - 1])) {
+    const run: any[] = [];
+    for (let i = ctx.idx; i < ctx.tokens.length && isLeafRunMember(ctx.tokens[i]); i++) {
+      run.push(ctx.tokens[i]);
+    }
+    // No `type` on the literal, so the `subTabular` quoting branch is not reached for a run. Passing it
+    // is measured identical everywhere tried, `lstlisting` in a nested cell included (`_tabular.js`).
+    const leaf: RenderTableCellContentResult =
+      renderTableCellContent({ children: run }, !!ctx.isSubTable, options, env, slf);
+    if (needTsv) {
+      appendToLastLine(acc.cellTsvLines, leaf.tsv);
+    }
+    if (needCsv) {
+      appendToLastLine(acc.cellCsvLines, leaf.csv);
+    }
+    if (needSmoothed) {
+      acc.cellSmoothed += leaf.tableSmoothed;
+    }
+    if (needMd) {
+      // A continuation line is its own cell token and its line break is not, so restore the space.
+      // Misses when the previous token is not `inline`; never over-adds, a trailing space or `>` stops it.
+      const prev: any = ctx.tokens[ctx.idx - 1];
+      if (leaf.tableMd && acc.cellMd && !/[\s>]$/.test(acc.cellMd)
+          && (prev?.type === 'inline' || prev?.token === 'inline')) {
+        acc.cellMd += ' ';
+      }
+      acc.cellMd += leaf.tableMd;
+    }
+  }
   handleListTokensForCellMarkdown(token, ctx, acc);
 };
 
@@ -255,7 +315,7 @@ const handleListTokensForCellMarkdown = (
     }
     acc.cellMd += '<br>';
   };
-  if (token?.type && ["itemize_list_open", "enumerate_list_open"].includes(token.type)) {
+  if (token?.type && LIST_OPEN_TOKEN_TYPES.has(token.type)) {
     const level = token?.prentLevel ?? 0;
     const prevType = prevToken?.type;
     const prevLevel = prevToken?.prentLevel ?? 0;
@@ -268,7 +328,7 @@ const handleListTokensForCellMarkdown = (
       addBr();
     }
     // Add a break between top-level lists.
-    const prevIsListClose: boolean = prevType === 'enumerate_list_close' || prevType === 'itemize_list_close';
+    const prevIsListClose: boolean = !!prevType && LIST_CLOSE_TOKEN_TYPES.has(prevType);
     if (prevIsListClose && prevLevel === 0) {
       addBr();
     }
@@ -288,15 +348,19 @@ const handleListTokensForCellMarkdown = (
     ensureTrailingEmptyLine(acc.cellTsvLines);
     ensureTrailingEmptyLine(acc.cellCsvLines);
     // Indent nested list items using non-breaking spaces (HTML).
-    const listLevel: number =  Math.max(1, isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel);
+    // `?? 1`: a marker-less item carries no level, and a marker looked up by NaN exported as `undefined`.
+    const level: number | undefined = isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel;
+    const listLevel: number = Math.max(1, level ?? 1);
     for (let i = 1; i < listLevel; i++) {
       mdPrefix += '&#160;&#160;';
       tsvPrefix += '  ';
       csvPrefix += '  ';
     }
+    // A marker-less item contributes nothing at all, not even the space a marker sits behind.
+    const markerLess: boolean = !!token.meta?.markerEmpty && !token.hasOwnProperty('marker');
     let markerMd: string = '';
-    let markerTsv: string = ' ';
-    let markerCsv: string = ' ';
+    let markerTsv: string = markerLess ? '' : ' ';
+    let markerCsv: string = markerLess ? '' : ' ';
     // If the token provides a custom marker, use it; otherwise default to bullet markers.
     if (token.hasOwnProperty('marker')) {
       if (token.markerTokens?.length > 0) {
@@ -311,7 +375,8 @@ const handleListTokensForCellMarkdown = (
         markerTsv += token.marker ?? '';
         markerCsv += token.marker ?? '';
       }
-    } else {
+    } else if (!token.meta?.markerEmpty) {
+      // A marker-less item has no marker to export; inventing one numbered what the document did not.
       const plainMarker: string = isEnumerate
         ? getEnumeratePlainMarker(Math.max(1, token.meta?.enumerateIndex ?? 1), listLevel)
         : getItemizePlainMarker(listLevel);
@@ -337,7 +402,7 @@ const handleListTokensForCellMarkdown = (
   if (token?.type === "latex_list_item_close") {
     const prevType = prevToken?.type;
     // Add a break between list items unless the list ends immediately after the item.
-    const shouldBreak: boolean = prevType !== 'itemize_list_close' && prevType !== 'enumerate_list_close';
+    const shouldBreak: boolean = !prevType || !LIST_CLOSE_TOKEN_TYPES.has(prevType);
     if (shouldBreak) {
       addBr();
     }
@@ -406,7 +471,7 @@ export const renderInlineTokenBlock = (
   let colspan = 0, rowspan = [], mr = 0;
   let numCol = 0;
 
-  const ctx: RenderCtx = { tokens, idx: 0, options, env, slf, highlight };
+  const ctx: RenderCtx = { tokens, idx: 0, options, env, slf, highlight, isSubTable };
   for (let idx = 0; idx < tokens.length; idx++) {
     ctx.idx = idx;
     let token = tokens[idx];

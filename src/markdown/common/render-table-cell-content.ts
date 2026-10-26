@@ -1,6 +1,6 @@
 import { TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
-import { getMdForChild, getMdLink } from "./table-markdown";
+import { asciiForMarkdown, getMdForChild, getMdLink, getMdMath, mdHref, SMILES_CLOSE } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
 import { isWhitespace } from "../common";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
@@ -16,6 +16,17 @@ export type RenderTableCellContentResult = {
   tableMd: string;
   /** "Smoothed" representation used for PPTX/DOCX or other layout-sensitive outputs. */
   tableSmoothed: string;
+};
+
+// A token that was itself rendered as a table carries its smoothed lines; everything else is
+// smoothed as rendered. Shared by the main loop and the link loop so the two cannot drift.
+const smoothedFor = (child, rendered: string): string => {
+  if (!Array.isArray(child.tableSmoothed)) {
+    return rendered;
+  }
+  return child.tableSmoothed.length > 0
+    ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
+    : '';
 };
 
 /**
@@ -75,11 +86,7 @@ export const renderTableCellContent = (
         child.meta = { ...(child.meta ?? {}), isTableCell: true };
       }
       let rendered = slf.renderInline([child], options, env);
-      const smoothedRendered = Array.isArray(child.tableSmoothed)
-        ? child.tableSmoothed?.length > 0
-          ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
-          : ''
-        : rendered;
+      const smoothedRendered: string = smoothedFor(child, rendered);
       smoothedCell += smoothedRendered;
       content += options.forPptx ? smoothedRendered : rendered;
 
@@ -87,20 +94,25 @@ export const renderTableCellContent = (
       const csvAscii = child.ascii_csv || child.ascii;
       const tsvData = child.tsv ? child.tsv.join(',') : child.content;
       const csvData = child.csv ? child.csv.join(',') : child.content;
-      if (ascii) {
-        tsvCell += ascii;
-        csvCell += csvAscii;
-      } else if (token.type === 'subTabular') {
-        if (token.parents?.length || ["backslashbox", "slashbox"].includes(child.type)) {
+      // An image writes its own tsv/csv value (the `src`) in the switch below; letting the generic
+      // append run first glued the alt from `content` onto it — `alt` + `i.png` in one cell.
+      const writesOwnPlainText: boolean = child.type === 'image' || child.type === 'includegraphics';
+      if (!writesOwnPlainText) {
+        if (ascii) {
+          tsvCell += ascii;
+          csvCell += csvAscii;
+        } else if (token.type === 'subTabular') {
+          if (token.parents?.length || ["backslashbox", "slashbox"].includes(child.type)) {
+            tsvCell += tsvData;
+            csvCell += csvData;
+          } else {
+            tsvCell += child.tsv ? `"${TsvJoin(child.tsv, options)}"` : child.content;
+            csvCell += child.csv ? CsvJoin(child.csv, options, true) : child.content;
+          }
+        } else {
           tsvCell += tsvData;
           csvCell += csvData;
-        } else {
-          tsvCell += child.tsv ? `"${TsvJoin(child.tsv, options)}"` : child.content;
-          csvCell += child.csv ? CsvJoin(child.csv, options, true) : child.content;
         }
-      } else {
-        tsvCell += tsvData;
-        csvCell += csvData;
       }
 
       switch (child.type) {
@@ -108,18 +120,34 @@ export const renderTableCellContent = (
           const href = child.attrGet('href');
           tsvCell += href;
           csvCell += href;
-          let link = getMdLink(child, token, j)
+          let link = getMdLink(child, token, j, options)
             .replace(/\|/g, '\\|');
+          // Outside the `if`: with link_open as the last child there is no label to emit, but the
+          // main loop already appended the opening `<a>`.
+          let depth = 1;
           if (link) {
             mdCell += link;
-            if (j + 1 < token.children.length) {
-              content += slf.renderInline([token.children[++j]], options, env);
-              j++;
+            // getMdLink already emitted [text](href). Render the rest of the link for HTML and
+            // stop on its own link_close, so following siblings are not consumed.
+            while (depth > 0 && j + 1 < token.children.length) {
+              const inner = token.children[++j];
+              if (inner.type === 'link_open') {
+                depth++;
+              } else if (inner.type === 'link_close') {
+                depth--;
+              }
+              const innerRendered: string = slf.renderInline([inner], options, env);
+              const innerSmoothed: string = smoothedFor(inner, innerRendered);
+              // Same choice as the main loop: forPptx takes the smoothed form. Without both lines
+              // the accumulators keep an opening `<a>` with no text and no closing tag.
+              content += options.forPptx ? innerSmoothed : innerRendered;
+              smoothedCell += innerSmoothed;
             }
-            if (j + 1 < token.children.length) {
-              content += slf.renderInline([token.children[++j]], options, env);
-              j++;
-            }
+          }
+          // The stream is partly hand-stitched: a link_open with no close would stay open.
+          if (depth > 0) {
+            content += '</a>';
+            smoothedCell += '</a>';
           }
           continue;
         }
@@ -142,7 +170,8 @@ export const renderTableCellContent = (
           csvCell += src;
           mdCell += options?.forMD
             ? rendered
-            : `![${child.attrGet('alt') ?? ''}](${src})`.replace(/\|/g, '\\|');
+            // `mdHref` as inside a label, so both paths write the destination the same way.
+            : `![${child.attrGet('alt') ?? ''}](${mdHref(src)})`.replace(/\|/g, '\\|');
           continue;
         }
         case 'code':
@@ -156,7 +185,7 @@ export const renderTableCellContent = (
         case 'smiles_inline':
           mdCell += getMdForChild(child);
           mdCell += child.content.replace(/\|/g, '\\|');
-          mdCell += '</smiles>';
+          mdCell += SMILES_CLOSE;
           continue;
         case "latex_lstlisting_env": {
           // codeText: mathescape \$ un-escaped + verbatim math; else raw content
@@ -180,19 +209,16 @@ export const renderTableCellContent = (
 
       mdCell += getMdForChild(child);
       if (child.latex) {
-        const { outMath } = options;
-        if (outMath?.table_markdown?.math_as_ascii && ascii) {
-          mdCell += child.ascii_md || ascii;
+        // Escaped like the path below: the ascii for `$|x|$` is `|x|`, and bare pipes re-cut the row.
+        const mdAscii: string = asciiForMarkdown(child);
+        if (options.outMath?.table_markdown?.math_as_ascii && mdAscii) {
+          mdCell += mdAscii
+            .replace(/\|/g, '\\|')
+            .replace(/\n/g, ' ');
           continue;
         }
-        let begin_math_inline_delimiters: string = '$';
-        let end_math_inline_delimiters: string = '$';
-        if (options.outMath?.table_markdown?.math_inline_delimiters?.length > 1) {
-          begin_math_inline_delimiters = options.outMath.table_markdown.math_inline_delimiters[0];
-          end_math_inline_delimiters = options.outMath.table_markdown.math_inline_delimiters[1];
-        }
-        let mdContent = mathTokenTypes.includes(child.type)
-          ? begin_math_inline_delimiters + child.content?.trim() + end_math_inline_delimiters
+        const mdContent: string = mathTokenTypes.includes(child.type)
+          ? getMdMath(child, options, child.content?.trim())
           : child.latex;
         mdCell += mdContent
           .replace(/\|/g, '\\|')

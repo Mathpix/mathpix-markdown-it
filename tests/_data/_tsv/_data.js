@@ -1589,5 +1589,85 @@ module.exports = [
       '"t1\n' +
       'a1, a2, a3, a4"\tST\tAlan Smith\n' +
       '\tST\tMark Viduka'
+  },
+  {
+    // Nested list on one line: item body ("d") must survive TSV extraction.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[x] d\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    tsv: '" 1. a\n' +
+      '   x d"'
+  },
+  {
+    // Link in a single-line nested item: the href must not be concatenated with the link text.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] [t](http://a.b)\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    tsv: '" 1. a\n' +
+      '   y http://a.b"'
+  },
+  {
+    // A link must not swallow the siblings that follow it in the cell.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
+      '\\end{tabular}',
+    tsv: 'http://a.b tail http://c.d b c'
+  },
+  {
+    // Leaf runs are bound by the cell: cell 2 must not bleed into cell 1.
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '[t](http://a.b) x & **b** y\n' +
+      '\\end{tabular}',
+    tsv: 'http://a.b x\tb y'
+  },
+  {
+    // By design a link is its href here, label and all: the loop that consumes the label tokens
+    // adds nothing to tsv. Pinned so a change to that loop cannot alter it silently.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[**b** x](http://a.b) tail\n' +
+      '\\end{tabular}',
+    tsv: 'http://a.b tail'
+  },
+  {
+    // An image is its src alone: the alt used to be emitted first and glued to it (`the alti.png`).
+    latex: '\\begin{tabular}{|l|}\n' +
+      '![the alt](i.png)\n' +
+      '\\end{tabular}',
+    tsv: 'i.png'
+  },
+  // Content before the first `\item` exports as its own line; 3.0.1 dropped it. The last one is the
+  // control: nothing before the first `\item`, unchanged.
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize} loose \\item a\\end{itemize}\\end{tabular}',
+    tsv: '" loose \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\itemsep 2pt \\item a\\end{itemize}\\end{tabular}',
+    tsv: '"\\itemsep 2pt \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{enumerate} intro \\item a\\end{enumerate}\\end{tabular}',
+    tsv: '" intro \n 1. a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\item a\\item b\\end{itemize}\\end{tabular}',
+    tsv: '" • a\n • b"'
+  },
+  // A fence in the cell joins the leaf run and exports its content. Only content-free tokens end a run,
+  // so listing `fence` among them would drop this silently; the second shape is the control without a list.
+  {
+    latex: '\\begin{tabular}{|l|}\n\\begin{itemize}\\item a\\end{itemize} ```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: '" • acode\n"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\n```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: 'code'
+  },
+  {
+    // The href and what follows it; the label is dropped by decision. 3.0.1 dropped the text after the
+    // link too. Pinned so restoring the label reads as a change of mind.
+    latex: '\\begin{tabular}{ l }\n[Q3 revenue](http://example.com/q3) trailing \\\\\n\\end{tabular}',
+    tsv: 'http://example.com/q3 trailing',
+    html: "<table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \"><a href=\"http://example.com/q3\" target=\"_blank\" rel=\"noopener\" style=\"word-break: break-word\">Q3 revenue</a> trailing</td>\n</tr>\n</tbody>\n</table>"
   }
 ];

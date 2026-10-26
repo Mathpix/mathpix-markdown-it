@@ -1,8 +1,10 @@
+import { warnDistinct } from "../common/warn-distinct";
+
 /**
  * State manager for nested LaTeX list environments (e.g., \begin{itemize}, \item).
  *
- * This module tracks the current depth of nested lists and the number of \item
- * entries opened at each depth level during parsing.
+ * Levels are a stack: enter pushes, leave pops, depth is the length. No separate depth index —
+ * an index plus an array are two sources of truth, and rolling back one desyncs `openItems`.
  *
  * Depth levels:
  *   -1 — outside of any list
@@ -15,9 +17,11 @@ export interface ListLevelState {
   openItems: number;
 }
 
-// Internal state
+// Counted, not boolean: a marker parsed inside another must not clear the flag early.
+let markerParseDepth = 0;
+
+// One entry per open list level, innermost last.
 let listLevels: ListLevelState[] = [];
-let currentListDepth: number = -1; // -1 means “not inside a list”
 
 /**
  * Reset all list-related state.
@@ -25,19 +29,16 @@ let currentListDepth: number = -1; // -1 means “not inside a list”
  */
 export const resetListState = (): void => {
   listLevels = [];
-  currentListDepth = -1;
+  // Stuck above zero, the flag mutes the inline list rules for good.
+  markerParseDepth = 0;
 };
 
 /**
  * Enter a new nested list level (e.g., encountering \begin{itemize}).
- * Automatically creates state storage for the new level if needed.
+ * The counter is always fresh: a discarded parse can leave a level with items still open.
  */
 export const enterListLevel = (): void => {
-  currentListDepth++;
-
-  if (!listLevels[currentListDepth]) {
-    listLevels[currentListDepth] = { openItems: 0 };
-  }
+  listLevels.push({ openItems: 0 });
 };
 
 /**
@@ -45,21 +46,12 @@ export const enterListLevel = (): void => {
  * If already outside lists, logs a warning.
  */
 export const leaveListLevel = (): void => {
-  if (currentListDepth < 0) {
-    console.warn('[list-state] Attempt to leave list level while depth = -1');
+  if (listLevels.length === 0) {
+    warnDistinct('leave:' + getListDepth(),
+      '[list-state] leaving a list level while outside any list', { depth: getListDepth() });
     return;
   }
-  currentListDepth--;
-};
-
-/**
- * Get the state object for a specific depth level.
- *
- * @param depth - The list depth level.
- * @returns State object or undefined.
- */
-export const getListLevelState = (depth: number): ListLevelState | undefined => {
-  return listLevels[depth];
+  listLevels.pop();
 };
 
 /**
@@ -68,7 +60,7 @@ export const getListLevelState = (depth: number): ListLevelState | undefined => 
  * @returns State object or undefined.
  */
 export const getCurrentListLevelState = (): ListLevelState | undefined => {
-  return listLevels[currentListDepth];
+  return listLevels[listLevels.length - 1];
 };
 
 /**
@@ -78,10 +70,10 @@ export const getCurrentListLevelState = (): ListLevelState | undefined => {
 export const incrementItemCount = (): void => {
   const level = getCurrentListLevelState();
   if (!level) {
-    console.warn(
+    warnDistinct('increment:' + getListDepth(),
       '[list-state] incrementItemCount called outside of any list level',
       {
-        currentListDepth,
+        currentListDepth: getListDepth(),
         listLevels,
       }
     );
@@ -89,3 +81,56 @@ export const incrementItemCount = (): void => {
   }
   level.openItems += 1;
 };
+
+/** Current nesting depth (-1 outside any list). Read-only view for cache keys. */
+export const getListDepth = (): number => listLevels.length - 1;
+
+/** How many lists are open right now — a live count, not a snapshot. */
+export const getOpenListCount = (): number => listLevels.length;
+
+// Structural: a length puts back neither a dropped level nor the `openItems` of a surviving one.
+// The empty case is shared: a top-level list opens with no levels yet, and that is the common one.
+const NO_LEVELS: readonly ListLevelState[] = Object.freeze([]);
+
+export const snapshotListLevels = (): readonly ListLevelState[] =>
+  listLevels.length === 0 ? NO_LEVELS : listLevels.map((level) => ({ openItems: level.openItems }));
+
+export const restoreListLevels = (snapshot: readonly ListLevelState[]): void => {
+  listLevels = snapshot.map((level) => ({ openItems: level.openItems }));
+};
+
+// A marker body is parsed with the block flag still set on `env`, so a list written there became a
+// real list inside the marker's `<span>`.
+export const isParsingMarker = (): boolean => markerParseDepth > 0;
+
+export const beginMarkerParse = (): void => {
+  markerParseDepth++;
+};
+
+export const endMarkerParse = (): void => {
+  // Clamped: one unpaired end would leave it negative, and the next marker parse would not register.
+  if (markerParseDepth > 0) {
+    markerParseDepth--;
+  }
+};
+
+/** The source the list itself handed to the inline parser: a command re-parsing its argument shares
+ *  `env`, so only the source tells the two apart. A symbol keeps it out of `Object.keys` and JSON,
+ *  non-enumerable also out of `snapshotEnvForInline`, which copies a token's enumerable symbols. */
+const LIST_INLINE_SRC: unique symbol = Symbol('mmd.listInlineSrc');
+
+export const setListInlineSrc = (env: any, src: string | null): string | null => {
+  const previous: string | null = env[LIST_INLINE_SRC] ?? null;
+  // Own, not `in`: assigning through an inherited one makes an own enumerable property.
+  if (Object.prototype.hasOwnProperty.call(env, LIST_INLINE_SRC)) {
+    env[LIST_INLINE_SRC] = src;
+  } else {
+    Object.defineProperty(env, LIST_INLINE_SRC, { value: src, writable: true, configurable: true });
+  }
+  return previous;
+};
+
+/** Is this parse the list's own, rather than a command argument nested inside it? A closer written in
+ *  `\footnote{…}` took the list's level from in there, leaving the real closer none to write. */
+export const isListOwnParse = (state: { src: string; env: any }): boolean =>
+  state.env?.[LIST_INLINE_SRC] === state.src;

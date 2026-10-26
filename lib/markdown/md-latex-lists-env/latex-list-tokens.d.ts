@@ -1,6 +1,33 @@
 import type Token from 'markdown-it/lib/token';
 import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./latex-list-types";
 /**
+ * Marker reservation for a custom `\item[...]` in `em`: sum of per-token widths (text by
+ * glyph class, math by `widthEx`) plus one marker→content gap. Shared by the inline and
+ * block item paths in `ListItems`.
+ *
+ * @param markerTokens - Parsed inline tokens of the marker
+ * @returns Total marker reservation in em
+ */
+export declare const computeMarkerPadding: (markerTokens: Token[] | undefined) => number;
+export declare const LIST_OPEN_TYPES: ReadonlySet<string>;
+export declare const LIST_CLOSE_TYPES: ReadonlySet<string>;
+/** Per list open, and copied onto its matching close: 0 needs no host, 1 sits in an `itemize`, 2 in an
+ *  `enumerate`. A list is hosted when the container it opens in is a list rather than an item — reading
+ *  only the token before it missed a list opening after a sibling's close, which then had no `<li>`. */
+export declare const listHostFlags: (tokens: Token[]) => Int8Array;
+export declare const absorbSublistIntoWrapper: (tokens: Token[], from: number) => void;
+/** What wrapping a run needs. `types` is the list stack these rules keep beside markdown-it's own, and
+ *  `Token` is optional because a hand-built state may not carry the constructor. */
+type LooseRunState = {
+    tokens: Token[];
+    level: number;
+    parentType: string;
+    types?: string[];
+    Token?: new (type: string, tag: string, nesting: number) => Token;
+};
+export declare const wrapLooseRun: (state: LooseRunState, from: number) => void;
+export declare const wrapListLevelRuns: (state: LooseRunState, from: number) => void;
+/**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,
  * and updates the internal list-level state (item counters).
@@ -16,7 +43,7 @@ import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./l
  */
 export declare const setTokenListItemOpenBlock: (state: any, startLine: number, endLine: number, marker: string | undefined, li: {
     value: number;
-} | null, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[]) => void;
+} | null, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[]) => Token;
 /**
  * Creates an opening token for LaTeX list environments (\begin{itemize}, \begin{enumerate}).
  * Updates list nesting state, parent tracking, and attaches itemize/enumerate
@@ -42,7 +69,7 @@ export declare const setTokenOpenList: (state: StateBlock, startLine: number, en
  *  - tokenStart: the created *_list_open token, if any
  *  - li: optional enumerate start value extracted via \setcounter
  */
-export declare const ListOpen: (state: StateBlock, startLine: number, lineText: string, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[]) => ListOpenResult;
+export declare const ListOpen: (state: StateBlock, startLine: number, lineText: string, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => ListOpenResult;
 /**
  * Closes the current LaTeX list environment (\end{itemize} / \end{enumerate}).
  *
@@ -53,9 +80,8 @@ export declare const ListOpen: (state: StateBlock, startLine: number, lineText: 
  * @param state - Markdown-It processing state
  * @param startLine - Line where the list block starts
  * @param endLine - Line where the list block ends
- * @returns The created closing list token
  */
-export declare const setTokenCloseList: (state: StateBlock, startLine: number, endLine: number) => void;
+export declare const setTokenCloseList: (state: StateBlock, startLine: number, endLine: number, opener?: Token) => void;
 /**
  * Processes a single inline token inside a LaTeX list item.
  *
@@ -72,3 +98,4 @@ export declare const setTokenCloseList: (state: StateBlock, startLine: number, e
  * @param ctx - Shared context for updating list state (padding, counters, levels)
  */
 export declare const processListChildToken: (state: any, item: ParsedListItem, child: Token, ctx: ListInlineContext) => void;
+export {};

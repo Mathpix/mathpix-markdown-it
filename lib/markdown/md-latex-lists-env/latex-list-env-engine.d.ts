@@ -1,5 +1,8 @@
 import type Token from 'markdown-it/lib/token';
 import { BufferedBlockState } from "./latex-list-types";
+export declare const listRuleFailureCount: () => number;
+export declare const resetListRuleFailures: () => void;
+export declare const warnListRuleFailed: (e: unknown) => void;
 /** Shallow clone but shift known position fields by baseOffset */
 export declare const shiftTokenAbsolutePositions: (tok: any, baseOffset: number) => any;
 /**
@@ -9,7 +12,10 @@ export declare const shiftTokenAbsolutePositions: (tok: any, baseOffset: number)
  * - Normalizes CRLF to LF.
  * - Computes `bMarks/eMarks/tShift` so `state.src.slice(bMarks[i]+tShift[i], eMarks[i])`
  *   matches each logical line (without a trailing "\n" after the last line).
- * - `env` is shallow-copied and forced to `{ isBlock: true }` for downstream checks.
+ * - `env` is shallow-copied and forced to `{ isBlock: true }` for downstream checks. The copy carries the
+ *   source-position buckets by reference, symbol keys and all, and this path does reach them — 1 of 25
+ *   lookups on a nested inline list — writing under the raw string as its own key, evicted by the same
+ *   LRU and released with the render.
  */
 export declare const buildBlockStateFromRaw: (md: any, raw: string, baseEnv: any) => any;
 /**

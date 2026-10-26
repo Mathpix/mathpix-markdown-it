@@ -19,7 +19,7 @@ export const codeStyles = (useColors: boolean = true): string => `
 #preview-content pre code, #setText pre code {
   font-family: 'DM Mono', Inconsolata, monospace;
   ${useColors ? `color: ${COLOR_PRE_CODE_TEXT};` : ''}
-  font-size: 15px;
+  font-size: inherit;
 }
 .hljs-comment, .hljs-quote,
 #preview-content .hljs-comment, #setText .hljs-comment,

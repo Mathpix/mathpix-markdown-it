@@ -2,7 +2,8 @@ import { MarkdownIt } from 'markdown-it';
 
 import { BeginTabular} from './md-block-rule/begin-tabular';
 import { BeginAlign } from './md-block-rule/begin-align';
-import { BeginTable, ClearTableNumbers, ClearFigureNumbers } from './md-block-rule/begin-table';
+import { BeginTable } from './md-block-rule/begin-table';
+import { clearTableNumbers, clearFigureNumbers } from './common/caption-counters';
 import { InlineIncludeGraphics } from './md-inline-rule/includegraphics';
 import { CaptionTable, InlineDecimal, IncludeGraphics } from './md-renderer-rules';
 import { ClearSubTableLists } from "./md-block-rule/begin-tabular/sub-tabular";
@@ -15,8 +16,8 @@ import { ClearExtractedCodeBlocks } from "./md-block-rule/begin-tabular/sub-code
 import { clearColumnStyleCache } from "./md-block-rule/begin-tabular/tabular-td";
 
 const clearTabularState = () => {
-  ClearTableNumbers();
-  ClearFigureNumbers();
+  clearTableNumbers();
+  clearFigureNumbers();
   ClearSubTableLists();
   ClearSubMathLists();
   ClearDiagboxTable();

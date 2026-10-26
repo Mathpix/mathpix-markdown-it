@@ -3,15 +3,6 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import { ListItemsResult, ParsedListItem } from "./latex-list-types";
 /**
- * Processes block-style LaTeX list items by parsing their content
- * using the block parser. This is used for items whose content
- * contains block environments (e.g., \begin{table}, \begin{figure}, etc.).
- *
- * @param state - Markdown-It processing state
- * @param items - Array of parsed list items
- */
-export declare const ListItemsBlock: (state: any, items: ParsedListItem[] | null | undefined) => void;
-/**
  * Processes LaTeX list items and generates Markdown-It tokens
  * for both inline content and nested list structures.
  *
@@ -27,7 +18,7 @@ export declare const ListItemsBlock: (state: any, items: ParsedListItem[] | null
  */
 export declare const ListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
-} | null, iOpen: number, itemizeLevelContents: string[]) => ListItemsResult;
+} | null, iOpen: number, itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => ListItemsResult;
 /**
  * Splits a line of LaTeX list content into logical items based on `\item`
  * and appends them to the given `items` array.
@@ -60,16 +51,17 @@ export declare const ItemsListPush: (items: ParsedListItem[], content: string, s
  * @param nextLine - Line number of the current line
  * @returns The updated list of parsed items
  */
-export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number) => ParsedListItem[];
+export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number, keepLineBreak?: boolean) => ParsedListItem[];
 export declare const finalizeListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
-} | null, iOpen: number, itemizeLevelContents: string[], tokenStart: Token | null) => {
+} | null, iOpen: number, itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => {
     iOpen: number;
     items: any[];
     li: any;
 };
-export declare const splitInlineListEnv: (lineText: string, match: any) => {
-    sB: string;
-    sE: string;
-    isBacktickEscapedPair: boolean;
-};
+/**
+ * Resolve per-list padding top-down (doc order) once every list's width is recorded. A list keeps
+ * the default unless its marker overflows the ancestor indent + default, then reserves the
+ * shortfall; the total (ancestor + own) is clamped to LIST_MAX_INDENT_EM. Depth = prentLevel.
+ */
+export declare const resolveListPadding: (listTokens: Token[]) => void;

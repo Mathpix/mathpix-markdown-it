@@ -403,6 +403,80 @@ Abstract</h4>
 </ol>
 </section>`
   },
+  {
+    latex: "\\renewcommand{\\x}{y} FFF",
+    html: "<div> FFF</div>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y}",
+    html: ""
+  },
+  {
+    latex: "\\renewcommand{\\x}{y} FFF\n\n\\begin{center}c\\end{center}",
+    html: "<div> FFF</div>\n<div class=\"center\" style=\"text-align: center\">c</div>"
+  },
+  {
+    latex: "\\renewcommand{\\a}{1}\\renewcommand{\\b}{2}",
+    html: ""
+  },
+  {
+    latex: "\\renewcommand{\\a}{1}\\renewcommand{\\b}{2} FFF",
+    html: "<div> FFF</div>"
+  },
+  {
+    // Where the line bound stops helping: no newline to bound at, so the name with no arguments takes
+    // the rest. Identical on 3.0.1, and pinned as the edge of the fix above.
+    latex: "aaa \\renewcommand bbb",
+    html: "<div>aaa </div>"
+  },
+  {
+    latex: "\\renewcommandfoo{a}{b} TAIL",
+    html: "<div>\\renewcommandfoo{a}{b} TAIL</div>"
+  },
+  {
+    latex: "text \\renewcommandfoo{a}{b} TAIL",
+    html: "<div>text \\renewcommandfoo{a}{b} TAIL</div>"
+  },
+  {
+    latex: "\\renewcommand2{a}{b} TAIL",
+    html: "<div>\\renewcommand2{a}{b} TAIL</div>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y} TAIL\n\\renewcommand{\\u}{unc\nplain VISIBLE\nmore VISIBLE2",
+    html: "<div> TAIL<br>\n<br>\nplain VISIBLE<br>\nmore VISIBLE2</div>"
+  },
+  {
+    latex: "aaa\n\\renewcommand{\\u}{unc\nplain VISIBLE",
+    html: "<div>aaa<br>\n<br>\nplain VISIBLE</div>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y}\\renewcommand{\\z}{w} TAIL `c`",
+    html: "<div> TAIL <code>c</code></div>"
+  },
+  {
+    latex: "> \\renewcommand{\\x}{y} FFF",
+    html: "<blockquote>\n<div> FFF</div>\n</blockquote>"
+  },
+  {
+    latex: "- \\renewcommand{\\x}{y} FFF",
+    html: "<ul>\n<li> FFF</li>\n</ul>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y}\\item b",
+    html: "<div>\\item b</div>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y} ```\ncode\n```",
+    html: "<div> ```<br>\ncode</div>\n<pre><code class=\"hljs\"></code></pre>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y} ~~~\ncode\n~~~",
+    html: "<div> ~~~<br>\ncode</div>\n<pre><code class=\"hljs\"></code></pre>"
+  },
+  {
+    latex: "\\renewcommand{\\x}{y} \\begin{tabular}{l}q\\end{tabular}",
+    html: "<div> <div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q</td>\n</tr>\n</tbody>\n</table>\n</div></div>"
+  },
   // {
   //   latex: '',
   //   html: ``

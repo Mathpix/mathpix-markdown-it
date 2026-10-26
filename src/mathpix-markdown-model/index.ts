@@ -157,6 +157,7 @@ export type TOutputMath = {
   include_svg?: boolean,
   include_linearmath?: boolean,
   include_table_html?: boolean,
+  /** A link cell holds its `href`, an image cell its `src`; the label is in `include_table_markdown`. */
   include_tsv?: boolean,
   include_csv?: boolean,
   include_table_markdown?: boolean,

@@ -974,7 +974,8 @@ export const skipBackticks = (src: string, pos: number): number => {
   const start: number = pos + tickCount;
   const end: number = src.indexOf(open, start);
   if (end === -1) {
-    return src.length;
+    // No partner: the run renders as text, and reading the rest as code hid a list's own `\end`.
+    return start;
   }
   return end + tickCount;
 };

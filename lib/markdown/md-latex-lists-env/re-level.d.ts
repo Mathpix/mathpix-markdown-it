@@ -28,6 +28,7 @@ export interface ItemizeLevelTokenResult {
     tokens: Token[][];
     contents: string[];
 }
+export declare const clearMarkerTokens: (env: any) => void;
 /**
  * Parse bullet tokens for all itemize levels.
  */
@@ -44,6 +45,8 @@ export declare const GetItemizeLevelTokens: (data?: Token[][] | null) => Token[]
  * Get both bullet content and parsed tokens from state.
  */
 export declare const GetItemizeLevelTokensByState: (state: StateBlock | StateInline) => ItemizeLevelTokenResult;
+/** Does `ChangeLevel` act on this command? */
+export declare const isListLabelCommand: (command: string) => boolean;
 /**
  * Change list style for \labelitemi, \labelenumi etc.
  * Supports both itemize and enumerate levels.
@@ -53,6 +56,7 @@ export declare const ChangeLevel: (state: StateBlock | StateInline, data: {
     params?: string;
 }) => boolean;
 /**
- * Clears stored itemize level token cache.
+ * Clears stored itemize level token cache. The definitions survive by design: set once per md
+ * instance, so a chunked host keeps a \renewcommand from an earlier chunk.
  */
 export declare const clearItemizeLevelTokens: () => void;

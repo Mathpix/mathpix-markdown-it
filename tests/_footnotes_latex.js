@@ -2,13 +2,15 @@ let chai = require('chai');
 let should = chai.should();
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
-const { getLabelsList } = require('../lib/index');
+const markdownIt = require('markdown-it');
+const { getLabelsList, mathpixMarkdownPlugin } = require('../lib/index');
 const {
   reFootnoteToken,
   reFootnotetextToken,
   reOpenTagFootnoteG,
   reOpenTagFootnotetextG,
 } = require('../lib/markdown/common/consts');
+const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 
 const options = {
   cwidth: 800
@@ -224,10 +226,116 @@ describe('Footnote token-guard soundness:', () => {
   });
 });
 
-describe('Footnote rule performance regression:', () => {
+// The list rule parses a body to answer a probe, so it can throw. It swallows that itself, which is
+// what makes every prober behave alike — the footnote scans, markdown-it's paragraph chain, lheading.
+describe('A throwing terminator probe does not fail the render:', () => {
+  const shapes = {
+    '\\footnote': 'Para \\footnote\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n{f}',
+    '\\footnotetext': 'Para \\footnotetext\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n{f}',
+    'paragraph chain': 'Paragraph text\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}',
+  };
+  Object.entries(shapes).forEach(([name, src]) => {
+    it(`${name}: the probe throw is contained and the document renders`, () => {
+      const md = markdownIt({ html: true })
+        .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+      // Break the speculative parse from inside — that is where the guard sits — and only while a
+      // probe is running: a real parse must keep failing loudly.
+      const rule = md.block.ruler.__rules__.find((r) => r.name === 'Lists');
+      const originalRule = rule.fn;
+      let silentDepth = 0;
+      rule.fn = function (state, start, end, silent) {
+        if (silent) { silentDepth++; }
+        try { return originalRule.apply(this, arguments); }
+        finally { if (silent) { silentDepth--; } }
+      };
+      md.block.ruler.__cache__ = null;
+      const original = listEnvEngine.createBufferedState;
+      let thrown = 0;
+      listEnvEngine.createBufferedState = function () {
+        if (silentDepth > 0) {
+          thrown++;
+          throw new Error('probe blew up');
+        }
+        return original.apply(this, arguments);
+      };
+      const warn = console.warn;
+      console.warn = () => {};
+      try {
+        const html = md.render(src);
+        thrown.should.be.above(0, 'the shape stopped reaching the list rule');
+        html.should.be.a('string');
+      } finally {
+        console.warn = warn;
+        listEnvEngine.createBufferedState = original;
+        rule.fn = originalRule;
+        listEnvEngine.resetListRuleFailures();   // degraded on purpose; the root hook holds the rest
+      }
+    });
+  });
+});
+
+// The terminator set is resolved once per ruler state rather than per block — a footnote at the end of
+// a document had every block ahead of it walk the whole ruler. The cache is keyed by the ruler's
+// compiled cache, so a rule enabled or disabled at runtime must stop or start being probed at once.
+describe('The resolved terminator set follows the ruler:', () => {
+  it('a rule disabled at runtime is no longer probed, and comes back when enabled', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const rule = md.block.ruler.__rules__.find((r) => r.name === 'hr');
+    const original = rule.fn;
+    let calls = 0;
+    rule.fn = function counted() {
+      calls++;
+      return original.apply(this, arguments);
+    };
+    // An unclosed `\footnote{` makes the scan probe every line ahead, so the terminator set is used.
+    const src = 'Text.\\footnote{unclosed note\n' +
+      Array.from({ length: 30 }, (_, i) => 'line ' + i).join('\n') + '\n';
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      md.render(src, {});
+      calls.should.be.above(0, 'the terminator set never reached the probed rule');
+      md.block.ruler.disable('hr');
+      calls = 0;
+      md.render(src, {});
+      calls.should.equal(0, 'a disabled rule was still served from the cache');
+      md.block.ruler.enable('hr');
+      calls = 0;
+      md.render(src, {});
+      calls.should.be.above(0, 'the rule did not come back after being enabled');
+    } finally {
+      console.warn = warn;
+      rule.fn = original;
+    }
+  });
+  // The set is keyed by the ruler's compiled cache, which markdown-it nulls on any enable/disable — the
+  // list rule's own block-content path toggles rules, and a nulled cache must still resolve correctly.
+  it('the set is resolved correctly with the ruler cache nulled', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    // No blank line, so the footnote scan runs into the list and must terminate at it.
+    const src = 'Para.\\footnote{note}\n\\begin{itemize}\n\\item a\n\\begin{center}\nq\n\\end{center}\n\\end{itemize}';
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      const before = md.render(src, {});
+      before.should.match(/<ul[^>]*class="itemize/, 'the footnote scan swallowed the list');
+      md.block.ruler.__cache__ = null;
+      md.render(src, {}).should.equal(before, 'a nulled ruler cache changed the terminator set');
+      // A list whose item holds a block env toggles the block rules mid-render, nulling that cache too.
+      md.render('\\begin{itemize}\n\\item a\n\\begin{center}\nq\n\\end{center}\n\\end{itemize}', {});
+      md.render(src, {}).should.equal(before, 'the set went stale after an internal toggle');
+    } finally {
+      console.warn = warn;
+    }
+  });
+});
+
+describe('Footnote rule performance regression:', function () {
+  // Every assert here is a growth ratio with a wide margin, so a retry only absorbs a load spike on the
+  // runner; a real regression fails all three attempts.
+  this.retries(2);
   // Parse-only timing — bypasses MathJax/render, isolates Phase 1 cost.
-  const { mathpixMarkdownPlugin } = require('../lib/markdown/mathpix-markdown-plugins');
-  const perfMd = require('markdown-it')({ html: true, breaks: true, linkify: true })
+  const perfMd = markdownIt({ html: true, breaks: true, linkify: true })
     .use(mathpixMarkdownPlugin, { width: 800 })
     .use(require('markdown-it-footnote'));
   const SCALING_RATIO_LIMIT = 60;
@@ -243,6 +351,8 @@ describe('Footnote rule performance regression:', () => {
     samples.sort((a, b) => a - b);
     return samples[2];
   };
+  // These two keep the absolute limit: their immune twin (a paragraph without the literal) costs
+  // less than SMALL_FLOOR_MS, so a normalised ratio would measure the floor, not the defect.
   // Worst case: long paragraph with literal substring inline — forces regex backtracking on master's Phase 1.
   const buildBodyWithLiteral = (lineCount, literal) => {
     const lines = [];
@@ -270,5 +380,139 @@ describe('Footnote rule performance regression:', () => {
       const large = measureMs(buildBodyWithLiteral(2000, literal) + tail);
       (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
     });
+  });
+
+  // Without the list terminator each footnotetext scan ran into the rest of the doc — O(N^2).
+  // Normalised against the blank-separated form in the same run, so the bound is machine-free.
+  it('list + \\footnotetext units scale like blank-separated ones', function () {
+    this.timeout(60000);
+    const unit = (sep) =>
+      'Paragraph text before the list with no blank line separator.' + sep +
+      '\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note inside the item.\n}\n\\end{itemize}';
+    const growth = (sep) => {
+      const build = (n) => Array.from({ length: n }, () => unit(sep)).join('\n');
+      return measureMs(build(2000)) / Math.max(measureMs(build(200)), SMALL_FLOOR_MS);
+    };
+    (growth('\n') / growth('\n\n')).should.be.below(5);
+  });
+
+  // The closer lookahead alone bails only when the source holds no closer at all, so one valid list
+  // at the end of the document used to restore the quadratic cost. The depth check inside the body
+  // walk covers that shape: measured 12x faster at 400 units, and flat from 200 to 400.
+  it('unclosed units followed by a valid list still scale like closed ones', function () {
+    this.timeout(60000);
+    const closedUnit = '\\begin{itemize}\n\\item[a] x\n\\end{itemize}';
+    const growth = (unit, tail) => {
+      const build = (n) => Array.from({ length: n }, () => unit).join('\n\n') + tail;
+      return measureMs(build(1000)) / Math.max(measureMs(build(100)), SMALL_FLOOR_MS);
+    };
+    const trailing = growth('\\begin{itemize}\n\\item[a] x', '\n\n' + closedUnit);
+    const closed = growth(closedUnit, '');
+    (trailing / closed).should.be.below(5);
+  });
+
+  // The depth check counts closers with a source sweep that cannot tell a real `\end` from one
+  // written inside a fence. Over-counting only keeps the walk going, so making the sweep stricter
+  // would abort a walk that currently succeeds — these two shapes are what would break.
+  const fence = '```';
+  it('a fake closer inside a fence leaves the list around it intact', () => {
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n' + fence + '\n\\end{itemize}\n' + fence + '\n\\item b\n\\end{itemize}\n',
+      { outMath: { include_svg: false } });
+    (html.match(/<ul/g) || []).should.have.length(1);
+    (html.match(/<li/g) || []).should.have.length(2);
+    html.should.match(/<code/);
+  });
+  it('a nested env whose only closer is the outer one leaves one list and the fence intact', () => {
+    // Depth reaches 2 here, so the check runs: the fenced closer is counted and the walk goes on.
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n' + fence +
+      '\n\\end{itemize}\n' + fence + '\n\\end{itemize}\n',
+      { outMath: { include_svg: false } });
+    (html.match(/<ul/g) || []).should.have.length(1);
+    (html.match(/<li/g) || []).should.have.length(1);
+    html.should.match(/<code/);
+  });
+  it('a fence mentioning an opener is opaque to the walk', () => {
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n' + fence + '\n\\begin{itemize}\n' + fence + '\n\\item b\n\\end{itemize}\n',
+      { outMath: { include_svg: false } });
+    (html.match(/<ul/g) || []).should.have.length(1);
+    (html.match(/<li/g) || []).should.have.length(2);
+    html.should.match(/<code/);
+  });
+
+  // Without the closer lookahead, each probe of an unclosed env scans to EOF — O(N^2) over N starts.
+  // Normalised against the closed form measured in the same run, so the bound does not depend on
+  // machine speed: measured 0.6 with the lookahead, 51 without.
+  it('unclosed \\begin{itemize} units scale like closed ones', function () {
+    this.timeout(60000);
+    const growth = (unit) => {
+      const build = (n) => Array.from({ length: n }, () => unit).join('\n');
+      const small = measureMs(build(100));
+      return measureMs(build(1000)) / Math.max(small, SMALL_FLOOR_MS);
+    };
+    const unclosed = growth('\\begin{itemize}\n\\item[a] x');
+    const closed = growth('\\begin{itemize}\n\\item[a] x\n\\end{itemize}');
+    (unclosed / closed).should.be.below(5);
+  });
+
+  // The scan asks for the terminator set per line while a footnote sits ahead. Counted, not timed: the
+  // walk is ~300k comparisons on 3200 lines, which a clock cannot separate from noise.
+  it('the terminator set is resolved once, not once per line', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const ruler = md.block.ruler;
+    const rules = ruler.__rules__;
+    let reads = 0;
+    Object.defineProperty(ruler, '__rules__', { get() { reads += 1; return rules; }, configurable: true });
+    // Both must sit ahead of the blocks: the rule bails when the last footnote is behind, and takes the
+    // fence-only set when no list opener follows — either way it never asks for the terminators.
+    const doc = (n) => Array.from({ length: n }, (_, i) => 'Line ' + i + ' of prose.').join('\n\n')
+      + '\n\n\\begin{itemize}\n\\item x\n\\end{itemize}\n\nTail \\footnote{a note}';
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      md.render(doc(200));
+      reads = 0;
+      md.render(doc(3200));
+    } finally {
+      console.warn = warn;
+      Object.defineProperty(ruler, '__rules__', { value: rules, writable: true, configurable: true });
+    }
+    reads.should.be.below(20, 'the ruler was walked per line: ' + reads + ' times');
+  });
+
+  // The same lookahead cut unclosed `\begin{tabular}` by 12–50x, but its growth stays super-linear:
+  // measured 13x over a 4x input against 58x on `master`. The bound pins that gap, not linearity.
+  it('unclosed \\begin{tabular} units grow far slower than on master', function () {
+    this.timeout(60000);
+    const build = (n) => '\\begin{tabular}{l}\na\n'.repeat(n);
+    const small = measureMs(build(100));
+    const growth = measureMs(build(400)) / Math.max(small, SMALL_FLOOR_MS);
+    growth.should.be.below(25);
+  });
+
+  // Counting work instead of timing it: the closer lookahead rejects an unclosed env before the
+  // scan, so the tag scanner is never entered. Deterministic — 0 with the lookahead, 12M without
+  // (counting rule invocations would not detect it: those are identical either way).
+  it('an unclosed \\begin{tabular} is rejected without scanning for tags', () => {
+    const utils = require('../lib/markdown/utils');
+    const original = utils.findOpenCloseTags;
+    let calls = 0;
+    utils.findOpenCloseTags = function counted() {
+      calls++;
+      return original.apply(this, arguments);
+    };
+    try {
+      const build = (unit) => Array.from({ length: 200 }, () => unit).join('\n');
+      MM.markdownToHTML(build('Para\n\\begin{tabular}{|l|}\nq'), { outMath: { include_svg: false } });
+      calls.should.equal(0);
+      // Control: a closed env does scan, so the counter is wired to something that runs.
+      MM.markdownToHTML(build('Para\n\\begin{tabular}{|l|}\nq\n\\end{tabular}'),
+        { outMath: { include_svg: false } });
+      calls.should.be.above(0);
+    } finally {
+      utils.findOpenCloseTags = original;
+    }
   });
 });

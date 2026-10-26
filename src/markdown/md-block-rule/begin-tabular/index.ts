@@ -14,6 +14,8 @@ import {
   BEGIN_TABULAR_BRACKET_RE_G
 } from "../../common/consts";
 import { parseBlockIntoTokenChildren } from "../helper";
+import { snapshotEnvForInline } from "../../common/env-transient";
+import { lastMatchPosCached } from "../../common/src-pos-cache";
 
 // group 1 = bracket pos, group 2 = column spec.
 export const openTag: RegExp = BEGIN_TABULAR_BRACKET_RE;
@@ -247,9 +249,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
           }
           const isSubTab = res[j].type === 'subTabular' || res[j].isSubTabular;
           if (isSubTab) {
-            tok.envToInline = {...state.env};
+            tok.envToInline = snapshotEnvForInline(state.env);
           } else {
-            if (!sharedEnvToInline) sharedEnvToInline = {...state.env};
+            if (!sharedEnvToInline) sharedEnvToInline = snapshotEnvForInline(state.env);
             tok.envToInline = sharedEnvToInline;
           }
           state.env.tabulare = false;
@@ -307,6 +309,16 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
   }
 };
 
+// Offset of the last tabular closer, cached per source on `env`. Own regex instance: `closeTagG` is
+// used with `match` elsewhere and this one carries a lastIndex.
+const TABULAR_END_POS_KEY = Symbol('mmd.tabularEndPos');
+// Deliberately the unanchored `closeTag`, not the anchored `closeTagTabular` the scan uses: a wider
+// sweep can only over-report a closer, which keeps the bail conservative. Do not "align" them.
+const CLOSE_TAG_SWEEP_G: RegExp = new RegExp(closeTag.source, 'g');
+
+const lastTabularEndPos = (state): number =>
+  lastMatchPosCached(state, TABULAR_END_POS_KEY, CLOSE_TAG_SWEEP_G);
+
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
@@ -317,6 +329,10 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     return false;
   }
   if (!openTagTabular.test(lineText)) {
+    return false;
+  }
+  // No closer left in the source: the scan below can only end in `!isCloseTagExist`, so skip it.
+  if (lastTabularEndPos(state) < state.bMarks[startLine]) {
     return false;
   }
   let isCloseTagExist = false;

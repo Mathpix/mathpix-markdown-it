@@ -1,6 +1,9 @@
 export declare const tocRegexp: RegExp;
+export declare const isAsciiLetter: (code: number) => boolean;
 export declare const isSpace: (code: any) => boolean;
 export declare const isWhitespace: (s: string) => boolean;
+/** Position of the next `endMarker` at or after `i` that is not escaped by a `\`, or -1. */
+export declare const findEndMarkerPos: (str: string, endMarker: string, i: number) => number;
 export declare const slugify: (s: string) => string;
 export declare const uniqueSlug: (slug: string, slugs: any) => string;
 export interface InlineCodeItem {
@@ -28,9 +31,9 @@ export declare const getInlineCodeListFromString: (str: any) => Array<InlineCode
  * The function returns an object containing the information:
  *     res: boolean, - Contains false if the end marker could not be found
  *     content?: string, - Contains content between start and end markers
- *     nextPos?: number - Contains the position of the end marker in the string
+ *     nextPos?: number - Contains the position just past the end marker (`endPos` is the marker itself)
  * */
-export declare const findEndMarker: (str: string, startPos?: number, beginMarker?: string, endMarker?: string, onlyEnd?: boolean, openBracketsBefore?: number) => {
+export declare const findEndMarker: (str: string, startPos?: number, beginMarker?: string, endMarker?: string, onlyEnd?: boolean, openBracketsBefore?: number, inlineCodePositions?: Set<number>) => {
     res: boolean;
     content?: undefined;
     openBrackets?: undefined;
@@ -49,6 +52,15 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     endPos: number;
     openBrackets?: undefined;
 };
+/** Offset past a `[...]` option at `at`, `at` itself when there is none, -1 when it does not close.
+ *  One reader for all three places that skip one: their own versions disagreed on `]` in a code span,
+ *  on `\]`, on `[[m]]` and on a `]` one line down — the last of which `sameLine` still decides. */
+export declare const skipOptionalArg: (text: string, at: number, sameLine: boolean, codePositions?: Set<number>) => number;
+/** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
+ *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
+ *  paired, so a closer or an `\item` in the body is part of the command, not structure.
+ *  Answers at `from`, absolute: a slice per command made reading a line of them quadratic. */
+export declare const renewCommandSpanEnd: (text: string, from?: number, codeIndex?: Set<number>) => number;
 export declare const getTerminatedRules: (rule: string) => any[];
 export declare const removeCaptionsFromTableAndFigure: (content: string) => {
     content: string;

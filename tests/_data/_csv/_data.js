@@ -1193,6 +1193,66 @@ module.exports = [
     csvQuoteAllFields: '"1","Some text in math","3"\n' +
       '"4","xy","f(x)={[x^(2)+1,,x > 1],[1,,x=1],[x+1,,x < 1]:}"'
   },
+  {
+    // A marker-less item hosts a nested list and has no marker of its own. It carried no level either,
+    // so the plain marker was looked up by NaN and the word `undefined` reached the export.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\n' +
+      '\\begin{enumerate}\\begin{itemize}\\end{itemize}\\begin{itemize}\\end{itemize}\\end{enumerate} \\\\\\hline\n' +
+      '\\end{tabular}',
+    tsv: '',
+    csv: '',
+    csvQuoteAllFields: ''
+  },
+  {
+    // An image is its src alone: the alt used to be emitted first and glued to it (`the alti.png`).
+    latex: '\\begin{tabular}{|l|}\n' +
+      '![the alt](i.png)\n' +
+      '\\end{tabular}',
+    tsv: 'i.png',
+    csv: 'i.png',
+    csvQuoteAllFields: '"i.png"'
+  },
+  // Content before the first `\item` exports as its own line; 3.0.1 dropped it. The last one is the
+  // control: nothing before the first `\item`, unchanged.
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize} loose \\item a\\end{itemize}\\end{tabular}',
+    tsv: '" loose \n • a"',
+    csv: '" loose \n • a"',
+    csvQuoteAllFields: '" loose \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\itemsep 2pt \\item a\\end{itemize}\\end{tabular}',
+    tsv: '"\\itemsep 2pt \n • a"',
+    csv: '"\\itemsep 2pt \n • a"',
+    csvQuoteAllFields: '"\\itemsep 2pt \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{enumerate} intro \\item a\\end{enumerate}\\end{tabular}',
+    tsv: '" intro \n 1. a"',
+    csv: '" intro \n 1. a"',
+    csvQuoteAllFields: '" intro \n 1. a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\item a\\item b\\end{itemize}\\end{tabular}',
+    tsv: '" • a\n • b"',
+    csv: '" • a\n • b"',
+    csvQuoteAllFields: '" • a\n • b"'
+  },
+  // A fence in the cell joins the leaf run and exports its content; the second shape is the control
+  // without a list. Quoting comes from the newline in the value, and from the option in the last column.
+  {
+    latex: '\\begin{tabular}{|l|}\n\\begin{itemize}\\item a\\end{itemize} ```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: '" • acode\n"',
+    csv: '" • acode\n"',
+    csvQuoteAllFields: '" • acode\n"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\n```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: 'code',
+    csv: 'code',
+    csvQuoteAllFields: '"code"'
+  }
   // {
   //   latex: '',
   //   tsv: '',

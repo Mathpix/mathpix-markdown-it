@@ -3,15 +3,86 @@ import type Renderer from "markdown-it/lib/renderer";
 import type MarkdownIt from "markdown-it";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 import { GetItemizeLevelTokens, GetEnumerateLevel, GetItemizeLevel } from "./re-level";
+import { listHostFlags, LIST_OPEN_TYPES } from "./latex-list-tokens";
 import { renderTabularInline } from "../md-renderer-rules/render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
-import { mathTokenTypes } from "../common/consts";
+import { mathTokenTypes, LIST_MAX_INDENT_EM } from "../common/consts";
 import { isMathInText } from "../utils";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
+import { warnDistinct } from "../common/warn-distinct";
+
+// data-padding-inline-start holds a machine-generated `Nem` (sole writer: list-items).
+// Validate the shape before inlining, so only a bare em value can ever reach the style.
+const PADDING_EM_RE = /^\d+(\.\d+)?em$/;
+const markerPaddingStyle = (padAttr: string | null | undefined): string => {
+  if (!padAttr) {
+    return "";
+  }
+  if (!PADDING_EM_RE.test(padAttr)) {
+    // Dropped silently before, so an attribute a consumer set by hand read as no indent at all.
+    warnDistinct('padding-shape', '[list] data-padding-inline-start is not a bare em value, ignored',
+      { value: padAttr });
+    return "";
+  }
+  // Our own writer clamps already; a hand-set value is clamped here rather than indenting off-screen.
+  if (parseFloat(padAttr) > LIST_MAX_INDENT_EM) {
+    return `padding-inline-start: ${LIST_MAX_INDENT_EM}em; `;
+  }
+  return `padding-inline-start: ${padAttr}; `;
+};
 
 var level_itemize = 0;
 var level_enumerate = 0;
+// Bumped where the parse phase resets, not on entry to the renderer: parse once and render twice stays
+// on one epoch, and the walk check below carries it.
+let parseEpoch = 0;
+/** Render-time list state, module-level like the marker registries — zeroed per render. */
+export const resetListRenderDepth = (): void => {
+  level_itemize = 0;
+  level_enumerate = 0;
+  resetAllEnumerateCounters();
+  parseEpoch++;
+};
+
+// A lone surrogate makes `encodeURI` throw, and that took the whole document down.
+const encodedMarker = (content: string): string => {
+  try {
+    return encodeURI(content ?? '');
+  } catch (e) {
+    return '';
+  }
+};
+
+// The host flag both list rules read, paired once per token array. Derived from the array rather than
+// carried between calls, so an unbalanced slice has no opener to pair with and its close stays bare.
+// Keyed by array identity, render epoch, and length plus the two end types. Reordering one in place
+// and re-rendering it within the same render keeps the old answer, as `attrJoin` keeps old classes.
+// The signature is O(1) by necessity: a checksum over the tokens would cost per query what this saves —
+// 3200 queries over 9600 tokens at 800 lists.
+const hostFlagsFor: WeakMap<Token[],
+  { epoch: number; sig: string; flags: Int8Array; lastIdx: number }> = new WeakMap();
+const signatureOf = (tokens: Token[]): string =>
+  tokens.length + ':' + (tokens[0]?.type ?? '') + ':' + (tokens[tokens.length - 1]?.type ?? '');
+const hostFlag = (tokens: Token[], idx: number): number => {
+  const sig: string = signatureOf(tokens);
+  let cached = hostFlagsFor.get(tokens);
+  // `idx <= lastIdx` means a new walk: the renderer only moves forward, measured over 2760 queries. On
+  // length and end types alone flags from the wrong content emitted an `<li>` with no close. Asking out
+  // of order costs a pairing per query — the price of re-rendering one array, unsupported either way.
+  if (!cached || cached.epoch !== parseEpoch || cached.sig !== sig || idx <= cached.lastIdx) {
+    cached = { epoch: parseEpoch, sig, flags: listHostFlags(tokens), lastIdx: idx };
+    hostFlagsFor.set(tokens, cached);
+  } else {
+    cached.lastIdx = idx;
+  }
+  return cached.flags[idx];
+};
+
+// The `<li>` a hosted list sits in. Its class follows the list that holds it, not the one it opens.
+const hostItemOpen = (flag: number): string => (flag === 1
+  ? '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">'
+  : '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">');
 type ListState = {
   enumerateCounters: number[]; // index = level-1
 };
@@ -109,7 +180,7 @@ const list_injectLineNumbers = (tokens, idx, className = '') => {
  *      - `<ul ... style="list-style-type: none">` for nested lists,
  *      - optionally wraps nested `<ul>` in `<li>` when a list is directly
  *        nested under another `itemize_list_open`.
- *  - For top-level lists, respects `data-padding-inline-start` attribute
+ *  - Respects `data-padding-inline-start` (top-level and nested)
  *    (translating it into inline CSS `padding-inline-start`).
  */
 export const render_itemize_list_open: Renderer.RenderRule = (
@@ -120,11 +191,11 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   const token: Token = tokens[idx];
-  // Reset nesting level for top-level lists
-  if ((token as any).isTopLevelList) {
+  // Drift at or below zero; a positive level is the per-render reset's job. A list from a wrapper's
+  // inline content claims top level, and resetting for it gave that list a level-1 marker.
+  if (token.isTopLevelList && level_itemize <= 0) {
     level_itemize = 0;
   }
-  const prevToken: Token | undefined = tokens[idx - 1];
   level_itemize++;
   let dataAttr = "";
   const className = "itemize";
@@ -134,11 +205,8 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   } else {
     token.attrJoin("class", className);
   }
-  // Translate data-padding-inline-start into inline style for top-level lists
-  const paddingInlineAttr = token.attrGet("data-padding-inline-start");
-  const paddingInlineStyle: string = paddingInlineAttr
-    ? `padding-inline-start: ${paddingInlineAttr}px; `
-    : "";
+  // Translate data-padding-inline-start into inline style (top-level and nested).
+  const paddingInlineStyle: string = markerPaddingStyle(token.attrGet("data-padding-inline-start"));
   // DOCX-specific: compute custom bullet metadata
   if (options.forDocx) {
     const itemizeLevelTokens: Token[][] = GetItemizeLevelTokens(token.itemizeLevel);
@@ -149,25 +217,20 @@ export const render_itemize_list_open: Renderer.RenderRule = (
         let markerInfo = isTextMarkerTokens(itemizeLevelTokens[levelIndex], slf, options, env);
         dataAttr += ` data-custom-marker-type="${markerInfo.markerType}"`;
         if (markerInfo.markerType === 'text') {
-          dataAttr += ` data-custom-marker-content="${encodeURI(markerInfo.textContent)}"`;
+          dataAttr += ` data-custom-marker-content="${encodedMarker(markerInfo.textContent)}"`;
         } else {
-          dataAttr += ` data-custom-marker-content="${encodeURI(itemizeLevelContents[levelIndex])}"`;
+          dataAttr += ` data-custom-marker-content="${encodedMarker(itemizeLevelContents[levelIndex])}"`;
         }
       }
     }
   }
   const attrs: string = slf.renderAttrs(token) + dataAttr;
-  const style: string = level_itemize > 1
-    ? 'list-style-type: none'
-    : `${paddingInlineStyle}list-style-type: none`;
+  // paddingInlineStyle is emitted per level (empty unless this list has a wide marker), so a
+  // nested list reserves for its own markers instead of overflowing the container.
+  const style: string = `${paddingInlineStyle}list-style-type: none`;
   const ulOpen: string = `<ul${attrs} style="${style}">`;
-  if (prevToken?.type === 'itemize_list_open') {
-    return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${ulOpen}`;
-  }
-  if (prevToken?.type === 'enumerate_list_open') {
-    return `<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">${ulOpen}`;
-  }
-  return ulOpen;
+  const host: number = hostFlag(tokens, idx);
+  return host ? hostItemOpen(host) + ulOpen : ulOpen;
 };
 
 /**
@@ -180,7 +243,7 @@ export const render_itemize_list_open: Renderer.RenderRule = (
  *  - Adds CSS class `enumerate <style>` (e.g. `enumerate decimal`).
  *  - Injects line-numbering attributes when `options.lineNumbering` is enabled.
  *  - For DOCX (`options.forDocx`), adds `data-list-style-type="<style>"`.
- *  - For top-level lists, respects `data-padding-inline-start` attribute
+ *  - Respects `data-padding-inline-start` (top-level and nested)
  *    and converts it into inline `padding-inline-start` CSS.
  */
 export const render_enumerate_list_open: Renderer.RenderRule = (
@@ -191,12 +254,12 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   const token: Token = tokens[idx];
-  // Reset nesting level for top-level enumerate lists
-  if ((token as any).isTopLevelList) {
+  // Same threshold as the itemize branch. The reset here is belt-and-braces: the per-level reset
+  // below runs on every open and already clears what a previous list left.
+  if (token.isTopLevelList && level_enumerate <= 0) {
     level_enumerate = 0;
     resetAllEnumerateCounters();
   }
-  const prevToken: Token | undefined = tokens[idx - 1];
   level_enumerate++;
   resetEnumerateCountersFromLevel(level_enumerate);
   let dataAttr = '';
@@ -213,27 +276,17 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   } else {
     token.attrJoin("class", className);
   }
-  // Map data-padding-inline-start → inline CSS for top-level lists
-  const paddingInlineAttr = token.attrGet("data-padding-inline-start");
-  const paddingInlineStyle = paddingInlineAttr
-    ? `padding-inline-start: ${paddingInlineAttr}px; `
-    : "";
+  // Map data-padding-inline-start → inline CSS (top-level and nested)
+  const paddingInlineStyle = markerPaddingStyle(token.attrGet("data-padding-inline-start"));
   // DOCX: pass style type to consumer
   if (options.forDocx) {
     dataAttr = ` data-list-style-type="${currentStyle}"`
   }
   const attrs: string = slf.renderAttrs(token) + dataAttr;
-  const style = level_enumerate > 1
-    ? `list-style-type: ${currentStyle}`
-    : `${paddingInlineStyle}list-style-type: ${currentStyle}`;
+  const style = `${paddingInlineStyle}list-style-type: ${currentStyle}`;
   const olOpen: string = `<ol${attrs} style="${style}">`;
-  if (prevToken?.type === 'itemize_list_open') {
-    return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${olOpen}`;
-  }
-  if (prevToken?.type === 'enumerate_list_open') {
-    return `<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">${olOpen}`;
-  }
-  return olOpen;
+  const host: number = hostFlag(tokens, idx);
+  return host ? hostItemOpen(host) + olOpen : olOpen;
 };
 
 const generateHtmlForMarkerTokens = (markerTokens, slf, options, env): {htmlMarker: string, markerType: string, textContent: string} => {
@@ -381,7 +434,7 @@ const buildCustomMarkerInfo = (token, options, slf, env): MarkerInfo => {
     const content = data.markerType === 'text'
       ? data.textContent
       : token.marker;
-    dataAttrs.push(`data-custom-marker-content="${encodeURI(content)}"`);
+    dataAttrs.push(`data-custom-marker-content="${encodedMarker(content)}"`);
   }
   const dataAttr: string = dataAttrs.length ? ' ' + dataAttrs.join(' ') : '';
   return { htmlMarker, dataAttr };
@@ -409,7 +462,7 @@ const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number)
       if (data.markerType === 'math') {
         const itemizeLevel = GetItemizeLevel(token.itemizeLevelContents);
         if (itemizeLevel.length >= level_itemize) {
-          dataAttr += ` data-custom-marker-content="${encodeURI(itemizeLevel[level_itemize - 1])}"`;
+          dataAttr += ` data-custom-marker-content="${encodedMarker(itemizeLevel[level_itemize - 1])}"`;
         }
         dataAttr += ' data-custom-marker="true"';
         dataAttr += ` data-custom-marker-type="${data.markerType}"`;
@@ -420,6 +473,24 @@ const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number)
   }
   return { htmlMarker, dataAttr };
 }
+
+// The `<li>` open tag every item branch builds: class through the line-numbering path when it is on,
+// then the token's own attributes plus whatever the branch adds.
+const openItemTag = (
+  tokens: Token[],
+  index: number,
+  options,
+  slf: Renderer,
+  className: string,
+  extra: string = ""
+): string => {
+  if (options?.lineNumbering) {
+    list_injectLineNumbers(tokens, index, className);
+  } else {
+    tokens[index].attrJoin("class", className);
+  }
+  return `<li${slf.renderAttrs(tokens[index])}${extra}>`;
+};
 
 /**
  * Core renderer for LaTeX list items (both `enumerate` and `itemize`).
@@ -464,6 +535,18 @@ const renderLatexListItemCore = (
     return isOpen ? "<li>" : `<li>${content}</li>`;
   }
   const isEnumerate: boolean = token.parentType === "enumerate";
+  // A chunk with no `\item` of its own: `<ul>` admits only `<li>`, but no marker and no number.
+  // Inside `<ol>` that takes the same shape as a custom marker, or the browser counts it as an item.
+  if (token.meta?.markerEmpty) {
+    // Same attribute pair the nested-list wrapper uses, so a consumer reading either tells this
+    // apart from a written item; line numbering is attached like every other `<li>`.
+    const base: string = isEnumerate ? 'li_enumerate not_number' : 'li_itemize';
+    const marks: string = ' data-custom-marker="true" data-marker-empty="true"'
+      + (isEnumerate ? ' style="display: block"' : '');
+    const emptyOpen: string = openItemTag(tokens, index, options, slf,
+      token.meta?.isBlock ? `${base} block` : base, marks);
+    return isOpen ? emptyOpen : `${emptyOpen}${content}</li>`;
+  }
   let dataAttr: string = "";
   let htmlMarker: string = "";
 
@@ -475,33 +558,21 @@ const renderLatexListItemCore = (
     token.meta = { ...(token.meta ?? {}), enumerateLevel, enumerateIndex };
     // Case 1: custom marker (e.g. \item[foo])
     if (hasCustomMarker) {
-      const className = 'li_enumerate not_number';
-      if (options?.lineNumbering) {
-        // line numbers
-        list_injectLineNumbers(tokens, index, className);
-      } else {
-        tokens[index].attrJoin("class", className);
-      }
       const markerInfo: MarkerInfo = buildCustomMarkerInfo(token, options, slf, env);
       dataAttr += markerInfo.dataAttr;
       htmlMarker = markerInfo.htmlMarker;
-      const prefix: string = `<li${slf.renderAttrs(token)}${dataAttr} style="display: block">` +
-        `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+      const prefix: string =
+        openItemTag(tokens, index, options, slf, 'li_enumerate not_number',
+          `${dataAttr} style="display: block"`)
+        + `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
       if (isOpen) {
         return prefix;
       }
       return `${prefix}${sContent}</li>`;
     }
     // Case 2: regular numbered enumerate element
-    const className = token.meta?.isBlock
-      ? 'li_enumerate block'
-      : 'li_enumerate';
-    if (options?.lineNumbering) {
-      list_injectLineNumbers(tokens, index, className);
-    } else {
-      tokens[index].attrJoin("class", className);
-    }
-    const prefix = `<li${slf.renderAttrs(token)}>`;
+    const prefix = openItemTag(tokens, index, options, slf,
+      token.meta?.isBlock ? 'li_enumerate block' : 'li_enumerate');
     if (isOpen) {
       if (needsPptxLeadingSpace()) {
         return prefix + "<span>&nbsp;</span>";
@@ -515,17 +586,10 @@ const renderLatexListItemCore = (
   token.meta = {...(token.meta ?? {}), itemizeLevel: level_itemize};
   htmlMarker = itemizeInfo.htmlMarker;
   dataAttr += itemizeInfo.dataAttr || "";
-  const className = token.meta?.isBlock
-    ? 'li_itemize block'
-    : 'li_itemize';
-  if (options?.lineNumbering) {
-    list_injectLineNumbers(tokens, index, className);
-  } else {
-    tokens[index].attrJoin("class", className);
-  }
   const prefix =
-    `<li${slf.renderAttrs(token)}${dataAttr}>` +
-    `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+    openItemTag(tokens, index, options, slf,
+      token.meta?.isBlock ? 'li_itemize block' : 'li_itemize', dataAttr)
+    + `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
   if (isOpen) {
     if (needsPptxLeadingSpace()) {
       return prefix + "<span>&nbsp;</span>";
@@ -597,7 +661,9 @@ export const render_item_inline: Renderer.RenderRule = (
     renderedContent = '&nbsp';
   }
   let nextToken: Token | undefined = tokens[idx+1];
-  if (nextToken?.type === 'itemize_list_open') {
+  // Either kind: a sublist of either sort belongs inside the item. Equivalent today — no shape reaching
+  // here opens an `enumerate`.
+  if (nextToken && LIST_OPEN_TYPES.has(nextToken.type)) {
     return renderLatexListItemCore(tokens, idx, options, env, slf, renderedContent, 'open');
   }
   return renderLatexListItemCore(tokens, idx, options, env, slf, renderedContent, 'full');
@@ -632,14 +698,7 @@ export const render_itemize_list_close: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   level_itemize--;
-  const nextToken: Token | undefined = tokens[idx + 1];
-  if ((level_itemize > 0 || level_enumerate > 0)
-    && nextToken?.type
-    && ["enumerate_list_close", "itemize_list_close"].includes(nextToken.type)
-  ) {
-    return "</ul></li>";
-  }
-  return "</ul>";
+  return hostFlag(tokens, idx) ? "</ul></li>" : "</ul>";
 };
 
 export const render_enumerate_list_close: Renderer.RenderRule  = (
@@ -650,12 +709,5 @@ export const render_enumerate_list_close: Renderer.RenderRule  = (
   slf: Renderer
 ): string => {
   level_enumerate--;
-  const nextToken: Token | undefined = tokens[idx + 1];
-  if ((level_itemize > 0 || level_enumerate > 0)
-    && nextToken?.type
-    && ["enumerate_list_close", "itemize_list_close"].includes(nextToken.type)
-  ) {
-    return "</ol></li>";
-  }
-  return `</ol>`;
+  return hostFlag(tokens, idx) ? "</ol></li>" : "</ol>";
 };

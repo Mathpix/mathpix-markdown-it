@@ -1,4 +1,4 @@
-import { Token, RuleBlock, Ruler, StateBlock } from 'markdown-it';
+import { Token, RuleBlock, Ruler } from 'markdown-it';
 import {
   reFootnoteToken,
   reFootnotetextToken,
@@ -7,69 +7,112 @@ import {
   reOpenTagFootnoteNumbered,
   reOpenTagFootnotetext,
   reOpenTagFootnotetextG,
-  reOpenTagFootnotetextNumbered
+  reOpenTagFootnotetextNumbered,
+  BEGIN_LIST_ENV_INLINE_RE
 } from "../common/consts";
 import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
+import type StateBlock from 'markdown-it/lib/rules_block/state_block';
+import { lastMatchPosCached } from "../common/src-pos-cache"
 
-// Symbol keys: collision-free on StateBlock; invisible to JSON.stringify/Object.keys (use `Object.getOwnPropertySymbols` to inspect).
+// Symbol keys: collision-free on the shared `env` the cache lives on, and invisible to
+// `Object.keys`, so the env snapshot leaves them alone.
 const FOOTNOTE_POS_KEY = Symbol('mmd.footnoteSrcPositions');
 const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 // Helper-owned /g sweeps. lastIndex is reset in the helper before each scan; sync-only.
 const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
 const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
+const LIST_BEGIN_POS_KEY = Symbol('mmd.footnoteListBeginPos');
+const LIST_BEGIN_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
 
-type FootnoteCacheEntry = { src: string; lastPos: number };
+// Terminators for the \footnote scan, kept minimal alongside fence.
+const LIST_RULE_NAME = "Lists";
+const LIST_TERMINATOR_NAME = new Set<string>([LIST_RULE_NAME]);
+// Terminators for the \footnotetext scan. `Lists` is not gated on a list opener ahead the way the
+// \footnote scan gates it: measured, gating it wins under 1% — the rule bails on its own first line.
+const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
+  "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
+  "list", LIST_RULE_NAME, "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
+  "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
+  "BeginTheorem", "headingSection", "mathMLBlock",
+  "abstractBlock",
+  "image_with_size_block"
+]);
 
-// Per-state cache of the last match offset (-1 if none). `patternG` MUST be /g.
-// Nested `state.md.block.parse(...)` builds a fresh StateBlock with its own src, so the Symbol-keyed cache on the outer state never leaks into nested parses.
-const getCachedSrcPositions = (
+
+// No guard here: a rule that parses a body to answer swallows its own throw (see the `Lists`
+// probe), so every rule left in this loop propagating means a bug in it stays visible.
+const anyTerminates = (
+  rules: RuleBlock[],
   state: StateBlock,
-  key: symbol,
-  patternG: RegExp,
-): number => {
-  const slot = state as unknown as Record<symbol, FootnoteCacheEntry | undefined>;
-  const cached = slot[key];
-  // JS strings are immutable — identity check correctly invalidates on any reassignment of `state.src`.
-  if (cached && cached.src === state.src) {
-    return cached.lastPos;
-  }
-  patternG.lastIndex = 0;
-  let lastPos = -1;
-  let m: RegExpExecArray | null;
-  while ((m = patternG.exec(state.src)) !== null) {
-    lastPos = m.index;
-    // Empty-match guard for future regex edits.
-    if (m.index === patternG.lastIndex) {
-      patternG.lastIndex++;
+  line: number,
+  endLine: number,
+): boolean => {
+  for (let i = 0; i < rules.length; i++) {
+    if (rules[i](state, line, endLine, true)) {
+      return true;
     }
   }
-  patternG.lastIndex = 0;
-  slot[key] = { src: state.src, lastPos };
-  return lastPos;
+  return false;
 };
 
-const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
+// Asked per block while a footnote sits ahead: 200 walks over 6400 ruler entries on 200 paragraphs.
+// Kept on the ruler, keyed by its compiled cache — markdown-it nulls that on any enable/disable.
+// An `fn` swapped in place does not: patch before the first render, or go through `ruler.at`.
+const RESOLVED_RULES_KEY = Symbol('mmd.resolvedTerminators');
+
+const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] => {
+  const token: any = (ruler as any).__cache__;
+  const host: any = ruler as any;
+  let byNames: Map<Set<string>, { token: any; fns: RuleBlock[] }> = host[RESOLVED_RULES_KEY];
+  if (!byNames) {
+    byNames = new Map();
+    host[RESOLVED_RULES_KEY] = byNames;
+  }
+  const cached = byNames.get(names);
+  // A null token means a toggle is in flight: resolve afresh.
+  if (token && cached && cached.token === token) {
+    return cached.fns;
+  }
   const rules = ruler.__rules__;
-  let arr: string[] = [
-    "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
-    "list", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
-    "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
-    "BeginTheorem", "headingSection", "mathMLBlock", "pageBreaksBlock",
-    "abstractBlock",
-    "image_with_size_block"
-  ];
-  let res = [];
+  const fns: RuleBlock[] = [];
   if (rules?.length) {
     for (let i = 0; i < rules.length; i++) {
-      let rule = rules[i];
-      if (rule.enabled && arr.includes(rule.name)) {
-        res.push(rule.fn);
+      const rule = rules[i];
+      if (rule.enabled && names.has(rule.name)) {
+        fns.push(rule.fn);
       }
     }
   }
-  return res;
+  if (!token) {
+    return fns;                         // a toggle is in flight: the entry could never be hit
+  }
+  byNames.set(names, { token, fns });
+  return fns;
+}
+
+// `fence` plus the resolved terminators, built once per resolution rather than per rule call.
+const WITH_FENCE_KEY = Symbol('mmd.terminatorsWithFence');
+const FENCE_ONLY: RuleBlock[] = [fence as unknown as RuleBlock];
+
+// Not `fence`: that name is the module import above, and a parameter shadowing it reads as the same rule.
+const terminatorsWithFence = (ruler: Ruler, names: Set<string>, fenceRule: RuleBlock): RuleBlock[] => {
+  const resolved: RuleBlock[] = resolveEnabledRuleFns(ruler, names);
+  const host: any = ruler as any;
+  // Per name set, as above: one slot would miss on every call once a second set appeared.
+  let byNames: Map<Set<string>, { resolved: RuleBlock[]; withFence: RuleBlock[] }> = host[WITH_FENCE_KEY];
+  if (!byNames) {
+    byNames = new Map();
+    host[WITH_FENCE_KEY] = byNames;
+  }
+  const cached = byNames.get(names);
+  if (cached && cached.resolved === resolved) {
+    return cached.withFence;
+  }
+  const withFence: RuleBlock[] = [fenceRule].concat(resolved);
+  byNames.set(names, { resolved, withFence });
+  return withFence;
 }
 
 export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silent) => {
@@ -79,7 +122,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Bail when the last `\footnote` literal is strictly before this block's start. Equality keeps the literal in scope (token starts on this block). `-1` from cache means no match anywhere.
-    const lastFootnotePos = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_SWEEP_G);
+    const lastFootnotePos = lastMatchPosCached(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_SWEEP_G);
     if (lastFootnotePos < state.bMarks[startLine]) {
       return false;
     }
@@ -94,9 +137,15 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnoteToken: boolean = reFootnoteToken.test(lineText);
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
-      // Only `fence` terminates here; footnotetext uses full terminator list (pre-existing).
+      // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
+      // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
+      // With no list opener ahead the list probe cannot fire, and it costs a silent Lists run per line.
+      const probeRules: RuleBlock[] =
+        lastMatchPosCached(state, LIST_BEGIN_POS_KEY, LIST_BEGIN_SWEEP_G) >= state.bMarks[startLine]
+          ? terminatorsWithFence(state.md.block.ruler, LIST_TERMINATOR_NAME, fence as RuleBlock)
+          : FENCE_ONLY;
       for (; nextLine < endLine; nextLine++) {
-        if (fence(state, nextLine, endLine, true)) {
+        if (anyTerminates(probeRules, state, nextLine, endLine)) {
           terminate = true;
         }
         if (terminate) { break; }
@@ -268,7 +317,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Bail when the last `\footnotetext`/`\blfootnotetext` literal is strictly before this block's start. Equality keeps it in scope. `-1` means no match anywhere.
-    const lastFootnotetextPos = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_SWEEP_G);
+    const lastFootnotetextPos = lastMatchPosCached(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_SWEEP_G);
     if (lastFootnotetextPos < state.bMarks[startLine]) {
       return false;
     }
@@ -280,17 +329,15 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
+    const terminatorRules: RuleBlock[] = resolveEnabledRuleFns(
+      state.md.block.ruler, FOOTNOTE_TERMINATOR_NAMES);
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnotetextToken: boolean = reFootnotetextToken.test(lineText);
     if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
-        for (let i = 0; i < terminatorRules.length; i++) {
-          if (terminatorRules[i](state, nextLine, endLine, true)) {
-            terminate = true;
-            break;
-          }
+        if (anyTerminates(terminatorRules, state, nextLine, endLine)) {
+          terminate = true;
         }
         if (terminate) {
           break;

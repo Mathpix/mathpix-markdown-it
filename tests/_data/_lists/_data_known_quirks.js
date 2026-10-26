@@ -1,0 +1,179 @@
+// Pre-existing list-rendering quirks pinned here so a future fix surfaces as an intentional snapshot
+// update, not a regression. Kept out of `_data.js` because that file states what the output should be,
+// and these shapes state what it is — each measured identical to `master`.
+//
+// When a quirk is fixed, replace the expected `html` with the new positive output.
+module.exports = [
+  {
+    // Crossed env names on one line. The closer now takes the tag of the list that is open rather than
+    // the one it names, so the tags balance; what stays wrong is that both lists come out empty.
+    name: "crossed itemize/enumerate on one line renders two empty lists",
+    latex: "\\begin{itemize}\n\\begin{enumerate} \\end{itemize} \\begin{itemize}\n\\end{itemize}\n",
+    html: "<div>\\begin{itemize}</div>\n<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"> </ol> <ul class=\"itemize\" style=\"list-style-type: none\"></ul>"
+  },
+  // The body walk reads its line textually and asks only about paired backticks, so a closer written in
+  // `$…$` still ends the list there. Inside a wrapper env it is text, because the wrapper collects its
+  // interior raw. Byte-identical to `master`.
+  {
+    name: "a closer written in math outside a wrapper still ends the list",
+    latex: "\\begin{itemize}\n\\item a $x \\end{itemize} y$\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a $x</li></ul><div>y$<br>\n\\item b<br>\n\\end{itemize}</div>\n"
+  },
+  // An argument is text to the readers that ask the source model, not to the item-content path — so the
+  // same closer ends the list once an `\item` precedes it. `master` ends it too, dropping the tail.
+  {
+    name: "a closer in \\caption after \\item on the opening line still ends the list",
+    latex: "\\begin{itemize}\\item a \\caption{x \\end{itemize} y}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a \\caption{x</li></ul> y}\\end{itemize}"
+  },
+  {
+    name: "the same closer before the first \\item is content, and the list survives",
+    latex: "\\begin{itemize} \\caption{x \\end{itemize} y}\n\\item AAA\n\\item BBB\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">  y}</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>AAA</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>BBB</li></ul>"
+  },
+  // One entry per command whose rule re-parses its argument, on a body line.
+  ...['caption', 'footnote', 'footnotetext', 'text', 'textbf'].map((name) => ({
+    name: 'a closer in \\' + name + ' on a body line still ends the list',
+    latex: '\\begin{itemize}\n\\item AAA \\' + name + '{x \\end{itemize} y}\n\\item BBB\n\\end{itemize}',
+    html: '<ul class="itemize" style="list-style-type: none"><li class="li_itemize"><span class="li_level">•</span>AAA \\'
+      + name + '{x</li></ul><div>y}<br>\n\\item BBB<br>\n\\end{itemize}</div>\n'
+  })),
+  // On one line the inline path emits the gap as text, so it lands directly in the `<ul>`. The
+  // two-line form is already clean.
+  {
+    name: "an empty list written on one line keeps its whitespace inside the <ul>",
+    latex: "\\begin{itemize}     \\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\">     </ul>"
+  },
+  // A nested list with no item of its own now closes its host `<li>`, so the tags balance. What stays
+  // wrong here is the empty `<ul></ul>`: a list element holding nothing at all.
+  {
+    name: "a nested list with no items of its own renders as an empty list element",
+    latex: "\\end{itemize}\ntext\ntext\n\\item[X] b\n\\end{tabular}\n\\begin{itemize}\n\\begin{itemize}\n\\end{itemize}\n`\\end{itemize}`\n`\\end{itemize}`\n\\end{itemize}\n",
+    html: "<div>\\end{itemize}<br>\ntext<br>\ntext<br>\n\\item[X] b<br>\n\\end{tabular}</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><code>\\end{itemize}</code></li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><code>\\end{itemize}</code></li></ul>"
+  },
+  // Same-line wrapper closers are taken whatever they sit inside: the check is off there because turning
+  // it on lost the tail. The wrapper's own block rule truncates at the inner closer, and `y}` follows it.
+  {
+    name: "a wrapper closer written inside \\caption still closes the wrapper",
+    latex: "\\begin{itemize}\\item a\n\\begin{center}\\caption{x \\end{center} y}\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<div class=\"center\" style=\"text-align: center\">\\caption{x </div>\n<div>y}\\end{center}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // Closing the list that is open also cured the depth drift the mismatch left behind: the list after
+  // the quirk now starts at its own level — `•` and `decimal`. `master` reaches `·` and `lower-roman`.
+  // Still here for the two empty lists above them.
+  {
+    name: "a top-level itemize after the crossed-names quirk uses the level-1 bullet",
+    latex: "\\begin{itemize}\n\\begin{enumerate} \\end{itemize} \\begin{itemize}\n\\end{itemize}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<div>\\begin{itemize}</div>\n<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"> </ol> <ul class=\"itemize\" style=\"list-style-type: none\"></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a top-level enumerate after the crossed-names quirk numbers from decimal",
+    latex: "\\begin{itemize}\n\\begin{enumerate} \\end{itemize} \\begin{itemize}\n\\end{itemize}\n\n\\begin{enumerate}\n\\item a\n\\end{enumerate}",
+    html: "<div>\\begin{itemize}</div>\n<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"> </ol> <ul class=\"itemize\" style=\"list-style-type: none\"></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a</li></ol>"
+  },
+  // A sibling that can never close is dropped with its items. The finished list above it is kept, which
+  // is why the rule declines the sibling at all; the tail reaches the item above and is lost there.
+  {
+    name: "a sibling whose only closer sits in a code span is dropped with its item",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize} \\item b `\\end{itemize}`",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "the same with two levels and the outer closer in a code span",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize} \\item b \\begin{itemize} \\item c \\end{itemize} `\\end{itemize}`",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a sibling enumerate whose closer sits in a code span is dropped the same way",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{enumerate} \\item b `\\end{enumerate}`",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    // One command is read off the line, so the first wins and the second shows. LaTeX applies the last.
+    name: "two \\setcounter left of a wrapper: the first applies, the second shows",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\setcounter{enumi}{9}\\begin{center}\nc\n\\end{center}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a<br>\n\\setcounter{enumi}{9}</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li></ol>"
+  },
+  {
+    // A wrapper body is opaque, so a command inside it is content: no counter, and it shows. `master`
+    // does not apply it either and emits `<>` instead. Left of the `\begin` it works (`_data.js`).
+    name: "\\setcounter inside a wrapper body renders as text",
+    latex: "\\begin{enumerate}\n\\item a\n\\begin{center}\\setcounter{enumi}{3}\nc\n\\end{center}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate block\"><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\setcounter{enumi}{3}<br>\nc</div>\n</li></ol>"
+  },
+  {
+    // On the inline path the command is read before the items, so one following an item is left in its
+    // content and the counter is not applied. Preceding the item it works — pinned in `_data.js`.
+    name: "\\setcounter after the item in a one-line list stays as text",
+    latex: "text \\begin{enumerate}\\item a\\setcounter{enumi}{7}\\end{enumerate} tail",
+    html: "<div>text <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a\\setcounter{enumi}{7}</li></ol> tail</div>\n"
+  },
+  {
+    // The probe's section counter is not rolled back, so both headings read higher: `1.`/`2.` with no
+    // block above the list. Same on `master`; pinned under `\footnotetext`, whose terminators now hold
+    // `Lists`.
+    name: "a speculative parse above a list shifts the section numbers",
+    latex: "\\footnotetext{f}\n\\begin{itemize}\n\\item \\begin{center}c\\end{center}\n\\section{Inner}\n\\end{itemize}\n\n\\section{After}",
+    html: "<div></div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div class=\"center\" style=\"text-align: center\">c</div>\n<h2 type=\"section\" class=\"section-title\" id=\"inner\">\n<span class=\"section-number\">3. </span>Inner</h2>\n</li></ul><h2 type=\"section\" class=\"section-title\" id=\"after\">\n<span class=\"section-number\">4. </span>After</h2>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\" style=\"list-style-type: none;\"><div>f</div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+    // `\caption` takes the closer into its argument and renders nothing here, so `\caption{c` is lost.
+    // `master` keeps it: it builds the list without requiring a reachable closer.
+    name: "a caption swallowing the only closer loses its own text",
+    latex: "\\begin{itemize} \\itemsep 1pt \\caption{c \\end{itemize} d}",
+    html: "<div>\\begin{itemize} \\itemsep 1pt  d}</div>\n"
+  },
+  {
+    // The unclosed `\caption{c` leaves a `}` that lands after its item close, so it sits in the `<ul>`.
+    // `master` builds no list here at all.
+    name: "a brace left over by an unclosed caption sits in the list",
+    latex: "\\begin{figure} \\begin{itemize}\n\\renewcommand{\\labelitemi}{\\begin{itemize}}\\renewcommand{\\labelitemi}{\\begin{itemize}}\n\\caption{c\n\\renewcommand*{\\x}{\\end{itemize}} \\end{itemize}",
+    html: "<div>\\begin{figure} <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">}<br>\n{</li></ul></li>}</ul></div>\n"
+  },
+  {
+    // A wrapper env on its own line ends the paragraph (`pickStartTag` in mdPluginRaw), so a list opened
+    // mid-paragraph above it is split: the inner level renders, the outer stays text. Guarding that break
+    // was measured to cost more — an unclosed list then swallowed a valid `figure` float.
+    name: "a closer past the last open list eats the text beside it",
+    // `\end{itemize}\end{itemize} trailing` over one level: the leftover holds list structure, so the
+    // handoff declines it (Non-Goals) and nothing else emits it — measured, no `ItemsAddToPrev` call.
+    // Byte-identical to `master`; the two-level form beside it in `_data.js` keeps `trailing`.
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize}\\end{itemize} trailing\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    // The wrapper's own block rule ends the paragraph (`pickStartTag` in mdPluginRaw), so a list opened
+    // mid-paragraph above it is split: the inner level renders, the outer stays text. Guarding that break
+    // was measured to cost more — an unclosed list then swallowed a valid `figure` float.
+    name: "a wrapper on its own line splits a list opened mid-paragraph",
+    latex: "text \\begin{itemize}\n\\item i0\n\\begin{itemize}\n\\item i1\n\\end{itemize}\n\\begin{center}x\\end{center}\n\\end{itemize}\n",
+    html: "<div>text \\begin{itemize}<br>\n\\item i0<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i1</li></ul></div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n<div>\\end{itemize}</div>\n"
+  },
+  {
+    // LaTeX gives the 6 to `b`; here the walk holds the value in a closure and the flush applies it to the
+    // first item of the batch, which is `a`. Byte-identical to `master`.
+    name: "\\setcounter between items numbers the item before it",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{5}\n\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"6\" class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    // The shape whose output changed: `Lists` declines a closer line holding a wrapper, `paragraphDiv`
+    // takes the document, and `\begin{center}` has no inline rule — `master` dropped it instead.
+    name: "a wrapper after the outermost closer is kept as literal LaTeX",
+    latex: "\\begin{itemize}\n\\item i0\n\\end{itemize} \\begin{center}x\\end{center}",
+    html: "<div><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i0</li></ul> \\begin{center}x\\end{center}</div>\n"
+  },
+  {
+    // The align rule takes the whole line: list and trailing text go with it, only `center` renders.
+    name: "a one-line env before a center loses the list and the text after it",
+    latex: "\\begin{itemize}\\item i0 \\end{itemize} \\begin{center}x\\end{center} tail",
+    html: "<div class=\"center\" style=\"text-align: center\">x</div>\n"
+  },
+  {
+    // Mid-paragraph the list survives, and there too `\begin{center}` has no inline rule to render it.
+    name: "the same env mid-paragraph keeps the list and leaves the center as text",
+    latex: "text \\begin{itemize}\\item i0 \\end{itemize} \\begin{center}x\\end{center} tail",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i0</li></ul> \\begin{center}x\\end{center} tail</div>\n"
+  },
+];

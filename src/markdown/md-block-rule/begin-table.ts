@@ -6,6 +6,7 @@ import { endTag, uid } from '../utils';
 import { includegraphicsTag } from '../md-inline-rule/utils';
 import { findEndMarker, removeCaptionsFromTableAndFigure, removeCaptionsSetupFromTableAndFigure } from "../common";
 import { appendEnvAwareContentLine } from "./helper";
+import { nextTableNumber, nextFigureNumber, currentTableNumber, currentFigureNumber } from "../common/caption-counters";
 import {
   RE_ALIGN_CENTERING_GLOBAL,
   RE_BEGIN_ALIGN_ENV,
@@ -17,17 +18,7 @@ import {
   RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL
 } from "../common/consts";
 
-var couterTables = 0;
-var couterFigures = 0;
 enum TBegin {table = 'table', figure = 'figure'};
-
-export const ClearTableNumbers = () => {
-  couterTables = 0;
-};
-
-export const ClearFigureNumbers = () => {
-  couterFigures = 0;
-};
 
 const StatePushCaptionTable = (state, type: string): void => {
   let caption = state.env.caption;
@@ -36,7 +27,7 @@ const StatePushCaptionTable = (state, type: string): void => {
   if (!caption) return;
 
   let token: Token;
-  const num: number = type === TBegin.table ? couterTables : couterFigures;
+  const num: number = type === TBegin.table ? currentTableNumber() : currentFigureNumber();
   token = state.push('caption_table', '', 0);
   token.attrs = [[`${type}-number`, num], ['class', `caption_${type}`]];
   token.children = [];
@@ -84,11 +75,9 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     token.attrJoin("class", "table");
   } else {
     if (type === TBegin.table) {
-      couterTables += 1;
-      currentNumber = couterTables;
+      currentNumber = nextTableNumber();
     } else {
-      couterFigures += 1;
-      currentNumber = couterFigures;
+      currentNumber = nextFigureNumber();
     }
     token.attrJoin("class", "table");
     token.attrJoin("number", currentNumber.toString());

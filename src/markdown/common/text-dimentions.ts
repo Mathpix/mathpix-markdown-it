@@ -1,7 +1,8 @@
 import { parse, Font, Glyph } from "opentype.js";
+import { DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } from "./consts";
 
-const fonSizeDef = 16;
-const exDef = 8.296875;
+const fonSizeDef = DEFAULT_FONT_SIZE_PX;
+const exDef = DEFAULT_EX_PX;
 export interface IFontMetricsOptions {
   font: ArrayBuffer,
   fontBold?: ArrayBuffer,

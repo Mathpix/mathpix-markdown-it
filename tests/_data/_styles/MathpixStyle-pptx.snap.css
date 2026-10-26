@@ -115,17 +115,17 @@ svg .math-block[data-width="full"] {
   border: none;
   padding: 0;
   overflow: auto;
-  font-size: 85%;
+  font-size: 0.9375em;
   line-height: 1.45;
   border-radius: 6px;
   box-sizing: border-box;
   background: #f8f8fa;
 }
 #preview-content pre code, #setText pre code {
-  padding: 1rem;
+  padding: 1em;
   display: block;
   overflow-x: auto;
-  line-height: 24px;
+  line-height: 1.6;
 }
 #preview-content table, #setText table {
   display: table;

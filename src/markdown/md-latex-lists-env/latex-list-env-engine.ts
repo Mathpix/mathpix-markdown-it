@@ -3,7 +3,30 @@ import type Token from 'markdown-it/lib/token';
 import type StateInline from "markdown-it/lib/rules_inline/state_inline";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import { ListsInternal } from "./latex-list-env-block";
+import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
+import { snapshotListLevels, restoreListLevels, type ListLevelState } from "./list-state";
 import { BufferedBlockState, PushFn } from "./latex-list-types";
+import { warnDistinct } from "../common/warn-distinct";
+
+// Raw count, not the distinct causes `warnDistinct` keeps: a failed rule renders literal LaTeX, which
+// every net reads as valid output, so the suite needs a detector of its own.
+let ruleFailures: number = 0;
+export const listRuleFailureCount = (): number => ruleFailures;
+export const resetListRuleFailures = (): void => {
+  ruleFailures = 0;
+};
+
+// One report per distinct cause per parse: the name alone collapses to `Error` for most
+// internal faults, and the caller has no other signal (see the diagnostics Non-Goal).
+export const warnListRuleFailed = (e: unknown): void => {
+  ruleFailures++;
+  const cause = e as Error;
+  warnDistinct('list-rule-failed:' + cause?.name + ':' + (cause?.message ?? ''),
+    '[list] list rule failed; skipping the list', e);
+};
+
+// Hoisted: safeAssignToken runs per flushed token, so a per-call Set would dominate the copy.
+const SAFE_ASSIGN_SKIP: Set<string> = new Set(["type", "tag", "nesting", "level", "block"]);
 
 /** Shallow clone but shift known position fields by baseOffset */
 export const shiftTokenAbsolutePositions = (tok: any, baseOffset: number) => {
@@ -43,7 +66,10 @@ export const shiftTokenAbsolutePositions = (tok: any, baseOffset: number) => {
  * - Normalizes CRLF to LF.
  * - Computes `bMarks/eMarks/tShift` so `state.src.slice(bMarks[i]+tShift[i], eMarks[i])`
  *   matches each logical line (without a trailing "\n" after the last line).
- * - `env` is shallow-copied and forced to `{ isBlock: true }` for downstream checks.
+ * - `env` is shallow-copied and forced to `{ isBlock: true }` for downstream checks. The copy carries the
+ *   source-position buckets by reference, symbol keys and all, and this path does reach them — 1 of 25
+ *   lookups on a nested inline list — writing under the raw string as its own key, evicted by the same
+ *   LRU and released with the render.
  */
 export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
   const normalized: string = raw.replace(/\r\n/g, "\n");
@@ -62,6 +88,7 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
     parentType: "root",
     level: 0,
     prentLevel: 0,
+    Token: TokenCtor,   // a real StateBlock carries it; rules build tokens through it
   };
   let offset: number = 0;
   for (let i = 0; i < lines.length; i++) {
@@ -73,7 +100,6 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
     if (i !== lines.length - 1) offset += 1;
   }
   st.push = (type: string, tag: string, nesting: number) => {
-    // const tok = new (Token as any)(type, tag, nesting);
     const tok = new TokenCtor(type, tag, nesting);
     tok.block = true;
     tok.level = st.level;
@@ -94,9 +120,18 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
  */
 export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   // prototype-inherit all read-only properties (bMarks, eMarks, src, etc.)
+  // `env` stays inherited, so the parse writes straight to the real env and the commit path needs no
+  // copy-back; a child env per probe measured slower than the snapshot (see the spec).
   const tempState = Object.create(state) as BufferedBlockState;
   tempState.tokens = [];
   tempState.level = state.level;
+  // Own, not inherited: the commit branch rewrites real `bMarks` from it, so a nested parse must not see
+  // the parent's. Unreachable today only by call order.
+  tempState.listTailFrom = undefined;
+  // Own copy: `types` is popped in place, so a pop before the first open would reach the real state.
+  if (Array.isArray((state as any).types)) {
+    tempState.types = (state as any).types.slice();
+  }
   tempState.push = ((type: string, tag: string, nesting: number) => {
     const tok = new TokenCtor(type, tag, nesting);
     tok.block = true;
@@ -123,8 +158,23 @@ export const parseListEnvRawToTokens = (
   baseEnv: any
 ): { ok: boolean; tokens: any[]; state: any } => {
   const blockState = buildBlockStateFromRaw(md, raw, baseEnv);
-  const ok: boolean = ListsInternal(blockState, 0, blockState.lineMax);
-  return { ok, tokens: blockState.tokens, state: blockState };
+  // Roll back caption counters if the speculative parse is discarded (!ok / throw); on ok
+  // the caller uses the tokens, so the numbers are kept. Mirrors the Lists block rule.
+  // No env rollback: this parse writes to a copy of env, not the caller's.
+  // (This path is reached with a complete env, so !ok only fires on an internal abort — a
+  // defensive rollback, not reachable via public input.)
+  const captionSnap = getCaptionCounters();
+  const listLevelSnap: readonly ListLevelState[] = snapshotListLevels();
+  let ok = false;
+  try {
+    ok = ListsInternal(blockState, 0, blockState.lineMax);
+    return { ok, tokens: blockState.tokens, state: blockState };
+  } finally {
+    if (!ok) {
+      setCaptionCounters(captionSnap);
+      restoreListLevels(listLevelSnap);
+    }
+  }
 };
 
 /**
@@ -177,9 +227,13 @@ export const flushBufferedTokens = (state: StateBlock, buffered: Token[]): void 
  * Safe assign: copy custom fields but do NOT overwrite core ones that markdown-it sets.
  */
 export const safeAssignToken = (target: any, src: any) => {
-  const SKIP = new Set(["type", "tag", "nesting", "level", "block"]);
-  for (const key of Object.keys(src)) {
-    if (SKIP.has(key)) continue;
+  // Object.keys, not `for...in`: measured faster here even with the array it allocates.
+  const keys: string[] = Object.keys(src);
+  for (let i = 0; i < keys.length; i++) {
+    const key: string = keys[i];
+    if (SAFE_ASSIGN_SKIP.has(key)) {
+      continue;
+    }
     target[key] = src[key];
   }
   return target;

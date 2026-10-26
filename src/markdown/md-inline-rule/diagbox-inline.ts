@@ -1,5 +1,7 @@
 import { RuleInline, Token, StateInline } from "markdown-it";
 import { extractNextBraceContent } from "../md-block-rule/begin-tabular/sub-cell";
+import { buildInlineCodePositionSet, getInlineCodeListFromString } from "../common";
+import { srcValueCached } from "../common/src-pos-cache";
 import { getSubTabular } from "../md-block-rule/begin-tabular/sub-tabular";
 import { getMathTableContent, getSubMath } from "../md-block-rule/begin-tabular/sub-math";
 import { getContent } from "../md-block-rule/begin-tabular/common";
@@ -7,6 +9,12 @@ import { reDiagbox } from "../common/consts";
 import { TTokenTabular } from "../md-block-rule/begin-tabular";
 import { parseAttributes } from '../common/parse-attribures';
 import { getExtractedCodeBlockContent } from "../md-block-rule/begin-tabular/sub-code";
+
+// One index per source, or a line of `\diagbox` paid for its whole tail on each.
+const CODE_POSITIONS: symbol = Symbol('diagbox-code-positions');
+const codeIndexOf = (state): Set<number> =>
+  srcValueCached(state, CODE_POSITIONS,
+    (src: string) => buildInlineCodePositionSet(getInlineCodeListFromString(src)));
 
 const processContent = (content: string): string => {
   try {
@@ -46,9 +54,10 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
 
     if (!match) return false;
 
-    const { index } = match;
-    let [left, newIndex] = extractNextBraceContent(str, index + match[0].length);
-    let [right, endIndex] = extractNextBraceContent(str, newIndex);
+    // Anchored, so the command sits at `pos`. By offset in `src`: an index per slice cost the whole tail.
+    const codeIndex: Set<number> = codeIndexOf(state);
+    let [left, newIndex] = extractNextBraceContent(src, pos + match[0].length, codeIndex);
+    let [right, endIndex] = extractNextBraceContent(src, newIndex, codeIndex);
 
     if (!silent) {
       const options = match[2] || '';
@@ -102,7 +111,7 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
       }
     }
 
-    state.pos += endIndex;
+    state.pos = endIndex;                 // absolute, like the offsets it came from
     return true;
   } catch (err) {
     console.error("[ERROR]=>[inlineDiagbox]=>", err);

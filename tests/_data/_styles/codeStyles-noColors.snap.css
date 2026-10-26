@@ -12,7 +12,7 @@
 #preview-content pre code, #setText pre code {
   font-family: 'DM Mono', Inconsolata, monospace;
   
-  font-size: 15px;
+  font-size: inherit;
 }
 .hljs-comment, .hljs-quote,
 #preview-content .hljs-comment, #setText .hljs-comment,

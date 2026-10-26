@@ -1,8 +1,8 @@
 /**
  * State manager for nested LaTeX list environments (e.g., \begin{itemize}, \item).
  *
- * This module tracks the current depth of nested lists and the number of \item
- * entries opened at each depth level during parsing.
+ * Levels are a stack: enter pushes, leave pops, depth is the length. No separate depth index —
+ * an index plus an array are two sources of truth, and rolling back one desyncs `openItems`.
  *
  * Depth levels:
  *   -1 — outside of any list
@@ -20,7 +20,7 @@ export interface ListLevelState {
 export declare const resetListState: () => void;
 /**
  * Enter a new nested list level (e.g., encountering \begin{itemize}).
- * Automatically creates state storage for the new level if needed.
+ * The counter is always fresh: a discarded parse can leave a level with items still open.
  */
 export declare const enterListLevel: () => void;
 /**
@@ -28,13 +28,6 @@ export declare const enterListLevel: () => void;
  * If already outside lists, logs a warning.
  */
 export declare const leaveListLevel: () => void;
-/**
- * Get the state object for a specific depth level.
- *
- * @param depth - The list depth level.
- * @returns State object or undefined.
- */
-export declare const getListLevelState: (depth: number) => ListLevelState | undefined;
 /**
  * Get the state object for the current depth level.
  *
@@ -46,3 +39,19 @@ export declare const getCurrentListLevelState: () => ListLevelState | undefined;
  * Logs a warning if called when no list level is active.
  */
 export declare const incrementItemCount: () => void;
+/** Current nesting depth (-1 outside any list). Read-only view for cache keys. */
+export declare const getListDepth: () => number;
+/** How many lists are open right now — a live count, not a snapshot. */
+export declare const getOpenListCount: () => number;
+export declare const snapshotListLevels: () => readonly ListLevelState[];
+export declare const restoreListLevels: (snapshot: readonly ListLevelState[]) => void;
+export declare const isParsingMarker: () => boolean;
+export declare const beginMarkerParse: () => void;
+export declare const endMarkerParse: () => void;
+export declare const setListInlineSrc: (env: any, src: string | null) => string | null;
+/** Is this parse the list's own, rather than a command argument nested inside it? A closer written in
+ *  `\footnote{…}` took the list's level from in there, leaving the real closer none to write. */
+export declare const isListOwnParse: (state: {
+    src: string;
+    env: any;
+}) => boolean;
